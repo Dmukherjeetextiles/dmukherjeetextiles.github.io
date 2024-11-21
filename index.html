@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Debrup's Portfolio</title>
+    <link rel="shortcut icon" href="img/icon.png" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <meta name="description" content="A Data Analyst portfolio website template for entry level data professionals. This is the portfolio website of Debrup Mukherjee, a multi-faceted Data professional with 5+ years of work experience.">
+    <meta name="author" content="Debrup Mukherjee">
+    <meta name="keywords" content="Debrup, Debrup Mukherjee, Data Analyst Portfolio Website, Data Scientist Portfolio Website, Resume Website, Github Portfolio">
+
+    <link rel="stylesheet" href="css/hamburger.css">
+    <link rel="stylesheet" href="css/global.css">
+    <link rel="stylesheet" href="css/default.css">
+    <link rel="stylesheet" href="css/media.css">
+
+    <script src="https://code.jquery.com/jquery-latest.min.js"></script>
+    <script src="js/menu.js"></script>
+    <script src="js/copy.js"></script>
+</head>
+
+<body>
+    <div class="top">
+        <div class="hamburger hamburger--boring" onclick="displayMenu();">
+            <div class="hamburger-box">
+                <div class="hamburger-inner"></div>
+            </div>
+        </div>
+        <div class="menu">
+            <p class="menu-item small-text menu-item-chosen" onclick="menuItem(this); showPage('bio');">Bio</p>
+            <p class="menu-item small-text" onclick="menuItem(this); showPage('work');">Works</p>
+            <p class="menu-item small-text" onclick="menuItem(this); showPage('resume');">Resume</p>
+            <p class="menu-item small-text" onclick="menuItem(this); showPage('contact');">Contact me</p>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="left-part" id="bio">
+            <p class="big-text">I'm Debrup Mukherjee</p>
+            <p class="small-text">I'm <b>a</b> Textile Technology graduate with career timeline as Sales Engineer, Marketing Analyst, Content Writer and <b>Data Analyst</b>, respectively, <b>with 5+ years of</b> total work <b>experience</b>. Python. R. SQL. Spreadsheets. BigQuery. API.</p>
+            <p class="small-text">Furthermore, I have freelance experience in UI/UX design for 2+ years. I'm also part of a band, Gulmo and I've been composing music for 8+ years.</p>
+        </div>
+
+        <div class="left-part" id="resume" style="display: none;">
+            <p class="big-text">Resume in PDF</p>
+            <p class="small-text">You can download my printable resume by clicking the <b>Download</b> button below.</p>
+            <a class="button" href="docs/Resume1811.pdf" target="_blank">Download</a>
+        </div>
+
+        <div class="left-part" id="work" style="display: none;">
+            <p class="big-text">Notable Projects</p>
+            <p class="small-text"><u><b><a href="https://www.kaggle.com/code/mukherjeedebrup/seo-keyword-research-using-r" target="_blank">Keyword Research</a></b></u> in R.</p>
+            <p class="small-text"><u><b><a href="https://www.kaggle.com/code/mukherjeedebrup/bigquery-american-health-rankings" target="_blank">Automate Data Analysis</a></b></u> in Python.</p>
+            <p class="small-text"><u><b><a href="https://fantasy-map.streamlit.app/" target="_blank">Cellular Automata</a></b></u> in Streamlit.</p>
+            <p class="small-text"><u><b><a href="https://medium.com/@dmukherjeetextiles/cyclistic-a-marketing-case-study-of-a-bike-sharing-company-a9e36fb92aea" target="_blank">Marketing Case Study</a></b></u> in R.</p>
+            <p class="small-text"><u><b><a href="https://www.kaggle.com/code/mukherjeedebrup/significant-earthquakes" target="_blank">Earthquakes(2150 BC-2023 AD)</a></b></u> in the world.</p>
+            <p class="small-text">A <u><b><a href="https://translator-narrator.streamlit.app/" target="_blank">Translator & Narrator</a></b></u> in Streamlit.</p>
+        </div>
+
+        <div class="left-part" id="contact" style="display: none;">
+            <p class="big-text">Let's Build Connections</p>
+            <p class="small-text" id="copy-email" onclick="copyEmail()">Send me an <u class="link"><b>email</b></u> for collab.</p>
+            <p class="small-text">Or, let's connect on <u><b><a href="https://www.linkedin.com/in/debrup-mukherjee-a05287223/" target="_blank">LinkedIn</a></b></u>, <u><b><a href="https://github.com/Dmukherjeetextiles" target="_blank">Github</a></b></u>, <u><b><a href="https://medium.com/@dmukherjeetextiles" target="_blank">Medium</a></b></u></p>
+            <p class="small-text">You can search for <b>Debrup Mukherjee</b> on Google, to find out more about other works by me.</p>
+            <p class="small-text">Website idea taken from <u><b><a href="https://github.com/vyshnovka" target="_blank">Vyshnovka.</a></b></u></p>
+        </div>
+
+        <div class="picture">
+            <img class="me" src="img/picture.png" alt="Self portrait of Debrup Mukherjee in Vector Graphics.">
+        </div>
+    </div>
+</body>
+
+</html>
