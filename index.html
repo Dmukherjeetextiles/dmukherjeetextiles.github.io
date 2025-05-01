@@ -1,75 +1,383 @@
 <!DOCTYPE html>
-<html>
-
+<html lang="en" itemscope itemtype="http://schema.org/Person">
 <head>
-    <title>Debrup's Portfolio</title>
-    <link rel="shortcut icon" href="img/icon.png" />
+    <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Professional web designer & developer creating stunning, responsive portfolios and business websites. Affordable solutions with modern designs.">
+    <meta name="keywords" content="web design, portfolio websites, business websites, responsive design, freelance web developer, dark mode toggle, dynamic colors">
+    <link rel="icon" href="icon.png" type="image/x-icon">
 
-    <meta name="description" content="A Data Analyst portfolio website template for entry level data professionals. This is the portfolio website of Debrup Mukherjee, a multi-faceted Data professional with 5+ years of work experience.">
-    <meta name="author" content="Debrup Mukherjee">
-    <meta name="keywords" content="Debrup, Debrup Mukherjee, Data Analyst Portfolio Website, Data Scientist Portfolio Website, Resume Website, Github Portfolio">
+    <!-- Schema Markup -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "Person",
+        "name": "Debrup Mukherjee",
+        "jobTitle": "Web Designer & Developer",
+        "url": "https://dmukherjeetextiles.github.io/", // Replace with your actual deployed URL
+        "sameAs": [
+            "https://www.linkedin.com/in/debrup-mukherjee-a05287223/",
+            "https://github.com/dmukherjeetextiles"
+            // Add other relevant profiles
+        ],
+        "description": "Business Analyst and designer specializing in creating modern, responsive websites for businesses and professionals.",
+        "image": "profile.jpg" // Make sure this image exists and path is correct
+    }
+    </script>
 
-    <link rel="stylesheet" href="css/hamburger.css">
-    <link rel="stylesheet" href="css/global.css">
-    <link rel="stylesheet" href="css/default.css">
-    <link rel="stylesheet" href="css/media.css">
-
-    <script src="https://code.jquery.com/jquery-latest.min.js"></script>
-    <script src="js/menu.js"></script>
-    <script src="js/copy.js"></script>
+    <title>Debrup Mukherjee | Business Analyst, Designer & Developer</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto+Slab:wght@100..900&display=swap" rel="stylesheet">
 </head>
-
 <body>
-    <div class="top">
-        <div class="hamburger hamburger--boring" onclick="displayMenu();">
-            <div class="hamburger-box">
-                <div class="hamburger-inner"></div>
+    <!-- Removed animated-bg div, background is handled by body/hero -->
+
+    <header id="hero">
+        <nav class="navbar">
+            <div class="logo">
+                <a href="https://dmukherjeetextiles.github.io/" aria-label="Home">DM</a>
             </div>
-        </div>
-        <div class="menu">
-            <p class="menu-item small-text menu-item-chosen" onclick="menuItem(this); showPage('bio');">Bio</p>
-            <p class="menu-item small-text" onclick="menuItem(this); showPage('work');">Works</p>
-            <p class="menu-item small-text" onclick="menuItem(this); showPage('resume');">Resume</p>
-            <p class="menu-item small-text" onclick="menuItem(this); showPage('contact');">Contact me</p>
-        </div>
-    </div>
+            <ul  class="nav-links " id="nav-links-list">
+                <li><a href="#portfolio"><i class="fas fa-th"></i> Work</a></li>
+                <li><a href="#pricing"><i class="fas fa-cogs"></i> Services</a></li>
+                <li><a href="#contact"><i class="fas fa-envelope"></i> Contact</a></li>
+            </ul>
+            <!-- Hamburger Menu Button -->
+            <div class="menu-toggle" id="mobile-menu-button">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+        </nav>
 
-    <div class="container">
-        <div class="left-part" id="bio">
-            <p class="big-text">I'm Debrup Mukherjee</p>
-            <p class="small-text">I'm <b>a</b> Textile Technology graduate with career timeline as Sales Engineer, Marketing Analyst, Content Writer and <b>Data Analyst</b>, respectively, <b>with 5+ years of</b> total work <b>experience</b>. Python. R. SQL. Spreadsheets. BigQuery. API.</p>
-            <p class="small-text">Furthermore, I have freelance experience in UI/UX design for 2+ years. I'm also part of a band, Gulmo and I've been composing music for 8+ years.</p>
+        <!-- Hero Section Content: Alphabets + CTA -->
+        <div class="hero-content">
+            <div class="alphabets">
+                 <!-- D for Dark Mode Toggle -->
+                 <div>
+                    <div class="capitalD interactive-letter" id="capitalD" title="Toggle Dark Mode"></div>
+                </div>
+                 <!-- E for Enquiry (Contact) -->
+                 <div>
+                    <div class="capitalE interactive-letter" id="capitalE" title="Go to Contact">
+                        <div class="rectangle"></div>
+                        <div class="rectangle"></div>
+                        <div class="rectangle"></div>
+                    </div>
+                </div>
+                 <!-- B for Bio (About) -->
+                 <div>
+                    <div class="capitalB interactive-letter" id="capitalB" title="Go to About Me"></div>
+                </div>
+                 <!-- R for Resume Section -->
+                 <div>
+                    <div class="capitalR interactive-letter" id="capitalR" title="Go to Resume Section"></div>
+                </div>
+                 <!-- U for Utilities (Pricing/Services) -->
+                 <div>
+                    <div class="capitalU interactive-letter" id="capitalU" title="Go to Services/Pricing"></div>
+                </div>
+                 <!-- P for Portfolio -->
+                 <div>
+                    <div class="capitalP interactive-letter" id="capitalP" title="Go to Portfolio"></div>
+                </div>
+            </div>
+            <a href="#portfolio" class="cta-button-outline" data-aos="zoom-in" data-aos-delay="600">View Work</a>
         </div>
+    </header>
 
-        <div class="left-part" id="resume" style="display: none;">
-            <p class="big-text">Resume in PDF</p>
-            <p class="small-text">You can download my printable resume by clicking the <b>Download</b> button below.</p>
-            <a class="button" href="docs/Resume_dmukherjee_1001.pdf" target="_blank">Download</a>
-        </div>
+    <main> 
+        <!-- Portfolio Grid Section -->
+        <section id="portfolio" class="container">
+            <h2 data-aos="fade-right">Recent Projects</h2>
+            <div class="portfolio-grid">
+                <!-- Professional Portfolios -->
+                <div class="project-card" data-aos="flip-up" data-category="professional">
+                    <div class="mobile-frame">
+                        <div class="mobile-header"></div>
+                        <iframe src="https://ashmita295.github.io/" title="Data Analyst Portfolio" loading="lazy"></iframe>
+                    </div>
+                    <div class="project-info">
+                        <h3>Data Analyst Portfolio</h3>
+                        <p>Clean, data-driven design with interactive visualizations</p>
+                    </div>
+                </div>
+                <div class="project-card" data-aos="flip-up" data-category="professional">
+                    <div class="mobile-frame">
+                        <div class="mobile-header"></div>
+                        <iframe src="https://deep6307.github.io/" title="Project Manager Portfolio" loading="lazy"></iframe>
+                    </div>
+                    <div class="project-info">
+                        <h3>Project Manager Portfolio</h3>
+                        <p>Professional design with scroll animations</p>
+                    </div>
+                </div>
+                 <div class="project-card" data-aos="flip-up" data-category="professional">
+                    <div class="mobile-frame">
+                        <div class="mobile-header"></div>
+                        <iframe src="https://thebaroqueviolinist.github.io/" title="Violin Teacher Portfolio" loading="lazy"></iframe>
+                    </div>
+                    <div class="project-info">
+                        <h3>Violin Teacher Portfolio</h3>
+                        <p>Casual design with grids</p>
+                    </div>
+                </div>
 
-        <div class="left-part" id="work" style="display: none;">
-            <p class="big-text">Notable Projects</p>
-            <p class="small-text"><u><b><a href="https://www.kaggle.com/code/mukherjeedebrup/seo-keyword-research-using-r" target="_blank">Keyword Research</a></b></u> in R.</p>
-            <p class="small-text"><u><b><a href="https://www.kaggle.com/code/mukherjeedebrup/bigquery-american-health-rankings" target="_blank">Automate Data Analysis</a></b></u> in Python.</p>
-            <p class="small-text"><u><b><a href="https://fantasy-map.streamlit.app/" target="_blank">Cellular Automata</a></b></u> in Streamlit.</p>
-            <p class="small-text"><u><b><a href="https://medium.com/@dmukherjeetextiles/cyclistic-a-marketing-case-study-of-a-bike-sharing-company-a9e36fb92aea" target="_blank">Marketing Case Study</a></b></u> in R.</p>
-            <p class="small-text"><u><b><a href="https://www.kaggle.com/code/mukherjeedebrup/significant-earthquakes" target="_blank">Earthquakes(2150 BC-2023 AD)</a></b></u> in the world.</p>
-            <p class="small-text">A <u><b><a href="https://translator-narrator.streamlit.app/" target="_blank">Translator & Narrator</a></b></u> in Streamlit.</p>
-        </div>
 
-        <div class="left-part" id="contact" style="display: none;">
-            <p class="big-text">Let's Build Connections</p>
-            <p class="small-text" id="copy-email" onclick="copyEmail()">Send me an <u class="link"><b>email</b></u> for collab.</p>
-            <p class="small-text">Or, let's connect on <u><b><a href="https://www.linkedin.com/in/debrup-mukherjee-a05287223/" target="_blank">LinkedIn</a></b></u>, <u><b><a href="https://github.com/Dmukherjeetextiles" target="_blank">Github</a></b></u>, <u><b><a href="https://medium.com/@dmukherjeetextiles" target="_blank">Medium</a></b></u></p>
-            <p class="small-text">You can search for <b>Debrup Mukherjee</b> on Google, to find out more about other works by me.</p>
-            <p class="small-text">Website idea taken from <u><b><a href="https://github.com/vyshnovka" target="_blank">Vyshnovka.</a></b></u></p>
-        </div>
+                <!-- Business Websites -->
+                <div class="project-card" data-aos="flip-up" data-aos-delay="100" data-category="business">
+                    <div class="mobile-frame">
+                        <div class="mobile-header"></div>
+                        <iframe src="https://fitkhao.github.io/" title="FitKhao Food Delivery Startup" loading="lazy"></iframe>
+                    </div>
+                    <div class="project-info">
+                        <h3>Nutritious Food Delivery Startup</h3>
+                        <p>Dynamic business website with dynamic logo</p>
+                    </div>
+                </div>
+                 <div class="project-card" data-aos="flip-up" data-aos-delay="100" data-category="business">
+                    <div class="mobile-frame">
+                        <div class="mobile-header"></div>
+                        <iframe src="https://fshorts.github.io/" title="FShorts Mobile App Startup" loading="lazy"></iframe>
+                    </div>
+                    <div class="project-info">
+                        <h3>Mobile App Startup for short films</h3>
+                        <p>Dynamic business website with pre-registration</p>
+                    </div>
+                </div>
+                <div class="project-card" data-aos="flip-up" data-aos-delay="100" data-category="business">
+                    <div class="mobile-frame">
+                        <div class="mobile-header"></div>
+                        <iframe src="https://www.framesandcolors.com/" title="Frames and Colors Agency" loading="lazy"></iframe>
+                    </div>
+                    <div class="project-info">
+                        <h3>Photography and Videography Agency</h3>
+                        <p>Mobile-responsive business website with interactions</p>
+                    </div>
+                </div>
+                <div class="project-card" data-aos="flip-up" data-aos-delay="100" data-category="business">
+                    <div class="mobile-frame">
+                        <div class="mobile-header"></div>
+                        <iframe src="https://gulmomusic.com/" title="Gulmo Music Band" loading="lazy"></iframe>
+                    </div>
+                    <div class="project-info">
+                        <h3>Bengali Progressive Rock Band</h3>
+                        <p>Mobile-responsive Band website with translation</p>
+                    </div>
+                </div>
+                <div class="project-card" data-aos="flip-up" data-aos-delay="100" data-category="business">
+                    <div class="mobile-frame">
+                        <div class="mobile-header"></div>
+                        <iframe src="https://thecraftynaari.github.io/" title="The Crafty Naari" loading="lazy"></iframe>
+                    </div>
+                    <div class="project-info">
+                        <h3>Local Hand-crafted works</h3>
+                        <p>Mobile-responsive business website with Product enquiries</p>
+                    </div>
+                </div>
+            </div>
+        </section>
 
-        <div class="picture">
-            <img class="me" src="img/picture.png" alt="Self portrait of Debrup Mukherjee in Vector Graphics.">
+        <!-- ===== Testimonials Section ===== -->
+        <section id="testimonials" class="container">
+            <h2 data-aos="fade-right">What Clients Say</h2>
+            <div class="testimonial-slider" data-aos="fade-up">
+                <div class="testimonial active">
+                    <blockquote>
+                        "Working with Debrup was a breeze! He delivered a fantastic portfolio website that exceeded my expectations. Highly recommended!"
+                    </blockquote>
+                    <cite>– Kazi Ashique Ur Rahaman, Gulmo</cite>
+                </div>
+                <div class="testimonial">
+                    <blockquote>
+                        "Our startup needed a professional online presence quickly. Debrup provided an excellent starter website within our budget. Great service!"
+                    </blockquote>
+                    <cite>– Puja Das, The Crafty Naari</cite>
+                </div>
+                 <div class="testimonial">
+                    <blockquote>
+                        "The attention to detail and the creative input were amazing. My website looks modern and functions perfectly on all devices."
+                    </blockquote>
+                    <cite>– Gourab Mondal, Frames and Colors</cite>
+                </div>
+                <!-- Testimonial Slider Controls -->
+                <div class="slider-controls">
+                    <button class="prev" aria-label="Previous Testimonial"><i class="fas fa-chevron-left"></i></button>
+                    <button class="next" aria-label="Next Testimonial"><i class="fas fa-chevron-right"></i></button>
+                </div>
+            </div>
+        </section>
+
+        <!-- ===== Pricing Section ===== -->
+        <section id="pricing" class="container">
+            <h2 data-aos="fade-left">Affordable Pricing</h2>
+            <div class="pricing-container" data-aos="fade-up">
+                <div class="pricing-card" data-aos="flip-left" data-aos-delay="100">
+                    <h3>Professional Portfolio</h3>
+                    <div class="price">₹500 <span class="price-term">One-Time</span></div>
+                    <p class="update-price">Updates: ₹350 per request</p>
+                    <ul>
+                        <li>✓ Custom Design</li>
+                        <li>✓ Responsive Layout</li>
+                        <li>✓ Direct CTA</li>
+                        <li>✓ Basic SEO</li>
+                        <li>✓ Social Media Links</li>
+                    </ul>
+                    <a href="#contact" class="cta-button-outline">Choose Plan</a>
+                </div>
+                <div class="pricing-card" data-aos="flip-right" data-aos-delay="200">
+                    <h3>Business Starter</h3>
+                    <div class="price">₹700 <span class="price-term">One-Time</span></div>
+                    <p class="update-price">Updates: ₹500 per request</p>
+                    <ul>
+                        <li>✓ Custom Design</li>
+                        <li>✓ Responsive Layout</li>
+                        <li>✓ Direct CTA + Map</li>
+                        <li>✓ Basic SEO</li>
+                        <li>✓ Up to 5 Pages</li>
+                        <li>✓ Image Gallery</li>
+                    </ul>
+                    <a href="#contact" class="cta-button-outline">Choose Plan</a>
+                </div>
+            </div>
+        </section>
+
+        <!-- ===== About Me Section ===== -->
+        <section id="about" class="container">
+            <h2 data-aos="fade-right">About Me</h2>
+            <div class="about-content" data-aos="fade-up">
+                <div class="about-text">
+                    <p>Hi, I'm Debrup Mukherjee, a designer and analyst, focused on creating clean, effective, and beautiful websites.</p>
+                    <p>I specialize in building portfolio sites for professionals and starter websites for small businesses, helping them establish a strong online presence without breaking the bank.</p>
+                    <p>My approach combines modern design trends with user-friendly functionality, ensuring your website not only looks great but also achieves your goals. I believe in clear communication and collaborating closely with clients to bring their vision to life.</p>
+                </div>
+                <div class="about-image" data-aos="zoom-in">
+                     <img src="profile.jpg" alt="A picture of Debrup Mukherjee" loading="lazy">
+                </div>
+            </div>
+        </section>
+
+        <!-- ===== More Projects & Resume Section ===== -->
+        <section id="more-projects" class="container">
+             <h2 data-aos="fade-left">Explore More</h2>
+             <div class="more-container" data-aos="fade-up">
+                 <div class="more-item" data-aos="fade-up" data-aos-delay="100">
+                     <h3>Other Projects</h3>
+                     <p>Check out some of my other work on GitHub:</p>
+                     <ul>
+                         <li><a href="https://github.com/Dmukherjeetextiles/fantasy-map" target="_blank" rel="noopener noreferrer">Map Generation using Python</a></li>
+                         <li><a href="https://github.com/Dmukherjeetextiles/translate-narrate" target="_blank" rel="noopener noreferrer">Reader with translations</a></li>
+                         <!-- Add more project links -->
+                     </ul>
+                 </div>
+                 <div class="more-item" data-aos="fade-up" data-aos-delay="200">
+                     <h3>Medium Articles</h3>
+                     <p>Read my thoughts on Data, design and development:</p>
+                      <ul>
+                         <li><a href="https://medium.com/p/49c81a60be8f" target="_blank" rel="noopener noreferrer">Data Analytics in Politics</a></li>
+                         <li><a href="https://medium.com/p/24d2e6cbe241" target="_blank" rel="noopener noreferrer">Metadata in DBMS (with Examples)</a></li>
+                         <li><a href="https://medium.com/p/73ef237a9b19" target="_blank" rel="noopener noreferrer">Data Encryption and Tokenization</a></li>
+                         <li><a href="https://medium.com/p/a9e36fb92aea" target="_blank" rel="noopener noreferrer">Cyclistic — A marketing case study of a bike-sharing company</a></li>
+                         <!-- Add more article links -->
+                     </ul>
+                 </div>
+                 <div class="more-item resume-download" data-aos="fade-up" data-aos-delay="300">
+                     <h3>My Resume</h3>
+                     <p>Interested in my detailed background?</p>
+                     <a href="Resume_dmukherjee_1001.pdf" download="Debrup_Mukherjee_Resume.pdf" class="cta-button-outline" id="resume-download-link">Download Resume</a>
+                     <!-- Make sure 'Debrup_Mukherjee_Resume.pdf' is the correct filename and exists in the same directory -->
+                 </div>
+             </div>
+        </section>
+
+        <!-- ===== Contact Section ===== -->
+        <section id="contact" class="container">
+            <h2 data-aos="fade-right">Get In Touch</h2>
+            <div class="contact-container" data-aos="fade-up">
+                <div class="contact-info">
+                    <h3>Contact Details</h3>
+                    <p><strong>Email:</strong> <a href="mailto:dmukherjeetextiles@gmail.com">dmukherjeetextiles@gmail.com</a></p>
+                    <p><strong>Phone:</strong> <a href="tel:+919007529332">+91 90075 29332</a></p>
+                    <p><strong>Location:</strong> North 24 Parganas, India</p>
+                    <h3>Follow Me</h3>
+                    <ul class="social-links">
+                        <li><a href="https://www.linkedin.com/in/debrup-mukherjee-a05287223/" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn Profile" class="fa-brands fa-linkedin"></a></li>
+                        <li><a href="https://github.com/dmukherjeetextiles" target="_blank" rel="noopener noreferrer" aria-label="GitHub Profile" class="fa-brands fa-github"></a></li>
+                        <li><a href="https://x.com/theDMukherjee" target="_blank" rel="noopener noreferrer" aria-label="Twitter Profile" class="fa-brands fa-twitter"></a></li>
+                        <li><a href="https://medium.com/@dmukherjeetextiles" target="_blank" rel="noopener noreferrer" aria-label="Medium Profile" class="fa-brands fa-medium"></a></li>
+                        <li><a href="https://wa.me/9007529332" target="_blank" rel="noopener noreferrer" aria-label="WhatsApp" class="fa-brands fa-whatsapp"></a></li>
+                    </ul>
+                </div>
+                <div class="contact-map">
+                     <h3>Find Me Here</h3>
+                    <!-- Google Maps Embed Code -->
+                    <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3682.4881423305587!2d88.41147217428914!3d22.635581630660965!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x39f89d9b23b28c9f%3A0x8659309a680d0297!2sDebrup%20Mukherjee!5e0!3m2!1sen!2sin!4v1746105859343!5m2!1sen!2sin" width="100%" height="450" style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade" title="My Location on Google Maps"></iframe>
+                </div>
+            </div>
+             <!-- Optional: Add a simple contact form here if needed -->
+        </section>
+    </main>
+
+    <!-- ===== Footer Section ===== -->
+    <footer>
+        <div class="footer-container container">
+            <div class="footer-links">
+                <h4>Quick Links</h4>
+                <ul>
+                    <li><a href="#hero">Home</a></li>
+                    <li><a href="#portfolio">Portfolio</a></li>
+                    <li><a href="#pricing">Pricing</a></li>
+                    <li><a href="#about">About</a></li>
+                    <li><a href="#contact">Contact</a></li>
+                </ul>
+            </div>
+            <div class="footer-social">
+                 <h4>Connect</h4>
+                 <ul class="social-links">
+                    <li><a href="https://www.linkedin.com/in/debrup-mukherjee-a05287223/" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn Profile" class="fa-brands fa-linkedin"></a></li>
+                    <li><a href="https://github.com/dmukherjeetextiles" target="_blank" rel="noopener noreferrer" aria-label="GitHub Profile" class="fa-brands fa-github"></a></li>
+                    <li><a href="https://x.com/theDMukherjee" target="_blank" rel="noopener noreferrer" aria-label="Twitter Profile" class="fa-brands fa-twitter"></a></li>
+                    <li><a href="https://medium.com/@dmukherjeetextiles" target="_blank" rel="noopener noreferrer" aria-label="Medium Profile" class="fa-brands fa-medium"></a></li>
+                    <li><a href="https://wa.me/9007529332" target="_blank" rel="noopener noreferrer" aria-label="WhatsApp" class="fa-brands fa-whatsapp"></a></li>
+                 </ul>
+            </div>
+            <div class="go-to-top" id="go-to-top" title="Go to Top">
+                <i class="fas fa-arrow-up"></i>
+            </div>
+
+            <script>
+                const goToTopButton = document.getElementById('go-to-top');
+                if (goToTopButton) { // Check if button exists
+                    const scrollThreshold = document.getElementById('hero')?.offsetHeight || 400; // Show after hero or 400px
+
+                    window.addEventListener('scroll', () => {
+                        if (window.scrollY > scrollThreshold) {
+                            goToTopButton.classList.add('visible'); // Add class to show
+                        } else {
+                            goToTopButton.classList.remove('visible'); // Remove class to hide
+                        }
+                    });
+
+                    // Scroll to top when button is clicked
+                    goToTopButton.addEventListener('click', () => {
+                        window.scrollTo({ top: 0, behavior: 'smooth' });
+                    });
+                }
+            </script>
+
+            
         </div>
-    </div>
+        <div class="footer-bottom">
+            <p>© <span id="current-year"></span> Debrup Mukherjee. All Rights Reserved.</p>
+        </div>
+    </footer>
+
+    <!-- JavaScript Files -->
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script> <!-- AOS Library -->
+    <script src="script.js"></script>
 </body>
-
 </html>
