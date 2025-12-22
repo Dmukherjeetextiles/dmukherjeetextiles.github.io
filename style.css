@@ -421,7 +421,7 @@ img, iframe {
 /* === Utility Classes === */
 .cta-button {
     display: inline-block;
-    background: var(--gradient);
+    background: var(--heading-color);
     color: var(--light-color); /* Use light color for text on gradient */
     padding: 12px 25px;
     border-radius: 50px;
