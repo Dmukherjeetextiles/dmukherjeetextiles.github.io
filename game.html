@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Google Tag Manager -->
+    <script>
+    (function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+    new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+    j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+    'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+    })(window,document,'script','dataLayer','GTM-K2MKRGPZ');
+    </script>
+    <title>Neural Arcade | Debrup Mukherjee</title>
+    
+    <style>
+        :root {
+            --bg-dark: #0a0a0a;
+            --panel-bg: #141414;
+            --accent-green: #4CAF50;
+            --accent-blue: #2196F3;
+            --accent-red: #ff3e3e;
+            --accent-yellow: #f1c40f;
+            --text-main: #e0e0e0;
+            --text-dim: #666;
+            --border: #222;
+            --font-mono: 'JetBrains Mono', 'Courier New', monospace;
+        }
+
+        * { box-sizing: border-box; }
+
+        body {
+            margin: 0;
+            background-color: var(--bg-dark);
+            color: var(--text-main);
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        /* CRT Scanline Effect Overlay */
+        body::before {
+            content: " ";
+            display: block;
+            position: fixed;
+            top: 0; left: 0; bottom: 0; right: 0;
+            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), 
+                        linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06));
+            z-index: 9999;
+            background-size: 100% 2px, 3px 100%;
+            pointer-events: none;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 60px;
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 40px;
+        }
+
+        .logo {
+            font-family: var(--font-mono);
+            font-size: 12px;
+            letter-spacing: 5px;
+            color: var(--accent-green);
+            text-transform: uppercase;
+            margin-bottom: 10px;
+            display: block;
+        }
+
+        h1 {
+            font-size: 3rem;
+            margin: 0;
+            font-weight: 800;
+            letter-spacing: -1px;
+            background: linear-gradient(to bottom, #fff, #666);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .tagline {
+            color: var(--text-dim);
+            font-style: italic;
+            font-family: 'Georgia', serif;
+        }
+
+        /* Game Grid */
+        .game-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+            gap: 25px;
+        }
+
+        .game-card {
+            background: var(--panel-bg);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            overflow: hidden;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            text-decoration: none;
+            color: inherit;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .game-card:hover {
+            transform: translateY(-8px);
+            border-color: var(--accent-green);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5), 0 0 15px rgba(76, 175, 80, 0.1);
+        }
+
+        .card-preview {
+            height: 180px;
+            background: #000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+            border-bottom: 1px solid var(--border);
+        }
+
+        /* Procedural abstract backgrounds for thumbnails */
+        .card-preview::after {
+            content: "";
+            position: absolute;
+            inset: 0;
+            opacity: 0.2;
+            background-image: radial-gradient(circle at 2px 2px, var(--accent-green) 1px, transparent 0);
+            background-size: 20px 20px;
+        }
+
+        .card-icon {
+            font-size: 50px;
+            z-index: 2;
+            transition: transform 0.3s ease;
+        }
+
+        .game-card:hover .card-icon {
+            transform: scale(1.2) rotate(5deg);
+        }
+
+        .card-content {
+            padding: 24px;
+            flex-grow: 1;
+        }
+
+        .card-content h3 {
+            margin: 0 0 10px 0;
+            font-size: 1.4rem;
+            color: #fff;
+        }
+
+        .card-content p {
+            font-size: 0.9rem;
+            color: var(--text-dim);
+            margin-bottom: 20px;
+            height: 40px;
+            overflow: hidden;
+        }
+
+        .card-meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-family: var(--font-mono);
+            font-size: 10px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--accent-green);
+        }
+
+        .btn-launch {
+            display: inline-block;
+            background: transparent;
+            border: 1px solid var(--accent-green);
+            color: var(--accent-green);
+            padding: 8px 16px;
+            border-radius: 4px;
+            font-weight: bold;
+            transition: all 0.2s;
+        }
+
+        .game-card:hover .btn-launch {
+            background: var(--accent-green);
+            color: #000;
+        }
+
+        footer {
+            margin-top: 80px;
+            text-align: center;
+            padding: 40px;
+            border-top: 1px solid var(--border);
+            color: var(--text-dim);
+            font-family: var(--font-mono);
+            font-size: 12px;
+        }
+
+        /* Color Variants */
+        .card-breaker { --accent: var(--accent-green); }
+        .card-chess { --accent: var(--accent-blue); }
+        .card-ludo { --accent: var(--accent-red); }
+        .card-runner { --accent: var(--accent-yellow); }
+        .card-snake { --accent: var(--accent-green); }
+        .card-sudoku { --accent: var(--accent-blue); }
+
+        @media (max-width: 768px) {
+            h1 { font-size: 2rem; }
+            .game-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-HXK18460W4"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-HXK18460W4');
+</script>
+</head>
+<body>
+
+    <div class="container">
+        <header>
+            <span class="logo">TERMINAL_PRO_V2.0</span>
+            <h1>NEURAL ARCADE</h1>
+            <p class="tagline">A collection of games in JS.</p>
+        </header>
+
+        <main class="game-grid">
+            
+            <!-- Brick Breaker -->
+            <a href="brick_breaker.html"  target="_blank" rel="noopener noreferrer" class="game-card card-breaker">
+                <div class="card-preview">
+                    <div class="card-icon">🧩</div>
+                </div>
+                <div class="card-content">
+                    <h3>Existential Breaker</h3>
+                    <p>Break through the architecture of loss and entropy. How long can you maintain stability?</p>
+                    <div class="card-meta">
+                        <span>Arcade / Action</span>
+                        <span class="btn-launch">LAUNCH</span>
+                    </div>
+                </div>
+            </a>
+
+            <!-- Chess -->
+            <a href="chess.html"  target="_blank" rel="noopener noreferrer" class="game-card card-chess">
+                <div class="card-preview" style="background: #111;">
+                    <div class="card-icon">♔</div>
+                </div>
+                <div class="card-content">
+                    <h3>Chess Pro</h3>
+                    <p>The ultimate test of logic and foresight in a vacuum of silence.</p>
+                    <div class="card-meta">
+                        <span>Strategy / 1v1</span>
+                        <span class="btn-launch">LAUNCH</span>
+                    </div>
+                </div>
+            </a>
+
+            <!-- Runner -->
+            <a href="runner.html"  target="_blank" rel="noopener noreferrer" class="game-card card-runner">
+                <div class="card-preview">
+                    <div class="card-icon">🛒</div>
+                </div>
+                <div class="card-content">
+                    <h3>Infinite Receipt</h3>
+                    <p>Run through the grocery void. Collect the items, avoid the debt. Keep the receipt clean.</p>
+                    <div class="card-meta">
+                        <span>Runner / Reflex</span>
+                        <span class="btn-launch">LAUNCH</span>
+                    </div>
+                </div>
+            </a>
+
+            <!-- Snake -->
+            <a href="snake.html"  target="_blank" rel="noopener noreferrer" class="game-card card-snake">
+                <div class="card-preview">
+                    <div class="card-icon">🐍</div>
+                </div>
+                <div class="card-content">
+                    <h3>Snake Pro</h3>
+                    <p>A neon-soaked evolution of the classic arcade reflex test. Feed the hunger.</p>
+                    <div class="card-meta">
+                        <span>Classic / Arcade</span>
+                        <span class="btn-launch">LAUNCH</span>
+                    </div>
+                </div>
+            </a>
+
+            <!-- Sudoku -->
+            <a href="sudoku.html" target="_blank" rel="noopener noreferrer"  class="game-card card-sudoku">
+                <div class="card-preview">
+                    <div class="card-icon">🔢</div>
+                </div>
+                <div class="card-content">
+                    <h3>Sudoku Pro</h3>
+                    <p>Bring order to the chaos. Solve the grid using pure logical deduction.</p>
+                    <div class="card-meta">
+                        <span>Logic / Puzzle</span>
+                        <span class="btn-launch">LAUNCH</span>
+                    </div>
+                </div>
+            </a>
+
+            <!-- Ludo -->
+            <a href="ludo.html" target="_blank" rel="noopener noreferrer"  class="game-card card-ludo">
+                <div class="card-preview">
+                    <div class="card-icon">🎲</div>
+                </div>
+                <div class="card-content">
+                    <h3>Ludo Pro</h3>
+                    <p>Four colors, one center. A game of chance and calculated risks for elite players.</p>
+                    <div class="card-meta">
+                        <span>Board / Multiplayer</span>
+                        <span class="btn-launch">LAUNCH</span>
+                    </div>
+                </div>
+            </a>
+
+            <!-- Tetris -->
+            <a href="tetris.html" target="_blank" class="game-card">
+                <div class="card-preview"><div class="card-icon">🧱</div></div>
+                <div class="card-content">
+                    <h3>Tetris Pro</h3>
+                    <p>Organize the falling fragments of a crumbling reality.</p>
+                    <div class="card-meta"><span>PUZZLE / REFLEX</span><span class="btn-launch">LAUNCH</span></div>
+                </div>
+            </a>
+
+            <!-- Mahjong -->
+            <a href="mahjong.html" target="_blank" class="game-card">
+                <div class="card-preview"><div class="card-icon">🀄</div></div>
+                <div class="card-content">
+                    <h3>Digital Mahjong</h3>
+                    <p>Match the encrypted symbols to clear the logic board.</p>
+                    <div class="card-meta"><span>ZEN / STRATEGY</span><span class="btn-launch">LAUNCH</span></div>
+                </div>
+            </a>
+
+        </main>
+
+        <footer>
+            [ SYSTEM STATUS: ALL MODULES OPERATIONAL ]<br>
+            &copy; 2026 <a href="http://dmukherjeetextiles.github.io">DEBRUP MUKHERJEE.</a> ALL RIGHTS RESERVED.
+        </footer>
+    </div>
+
+    <script>
+        // Optional: Add a simple flicker effect to cards on load
+        document.querySelectorAll('.game-card').forEach((card, index) => {
+            card.style.opacity = '0';
+            setTimeout(() => {
+                card.style.transition = 'opacity 0.5s ease';
+                card.style.opacity = '1';
+            }, index * 100);
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Google Tag Manager -->
+    <script>
+    (function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+    new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+    j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+    'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+    })(window,document,'script','dataLayer','GTM-K2MKRGPZ');
+    </script>
+    <title>The Infinite Receipt | Pro Runner</title>
+    
+    <style>
+        :root {
+            --bg-color: #1a1a1a;
+            --panel-color: #252525;
+            --accent-green: #4CAF50;
+            --accent-red: #ff3e3e;
+            --text-main: #ffffff;
+            --paper-white: #f5f5f5;
+            --ink-black: #222;
+        }
+
+        body {
+            margin: 0;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            font-family: 'Segoe UI', Roboto, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        #game-container {
+            display: flex;
+            gap: 30px;
+            padding: 20px;
+            background: var(--panel-color);
+            border-radius: 12px;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+            border: 1px solid #333;
+        }
+
+        /* The Receipt Viewport */
+        #viewport {
+            position: relative;
+            width: 350px;
+            height: 550px;
+            background-color: var(--paper-white);
+            border-radius: 4px;
+            overflow: hidden;
+            border: 5px solid #111;
+        }
+
+        /* Technical Twist: CSS Animation for Background */
+        .receipt-scroll {
+            position: absolute;
+            top: -100%;
+            left: 0;
+            width: 100%;
+            height: 200%;
+            /* INSERT YOUR RECEIPT TEXTURE PNG HERE */
+            background-image: url('receipt_paper.png'); 
+            background-size: cover;
+            animation: scrollDown var(--scroll-speed, 4s) linear infinite;
+            z-index: 1;
+        }
+
+        @keyframes scrollDown {
+            from { transform: translateY(0); }
+            to { transform: translateY(50%); }
+        }
+
+        #player {
+            position: absolute;
+            width: 45px;
+            height: 45px;
+            /* INSERT YOUR PLAYER PNG HERE */
+            background-image: url('materials/person.png');
+            background-size: contain;
+            background-repeat: no-repeat;
+            background-position: center;
+            /* Fallback color if image is missing */
+            background-color: transparent; 
+            bottom: 40px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 10;
+        }
+
+        .obstacle {
+            position: absolute;
+            width: 50px; /* Adjust based on your sprite size */
+            height: 50px;
+            background-size: contain;
+            background-repeat: no-repeat;
+            background-position: center;
+            z-index: 5;
+            /* Optional: Add a subtle shadow to make sprites pop from paper */
+            filter: drop-shadow(2px 2px 2px rgba(0,0,0,0.1));
+        }
+
+        /* UI Panels */
+        .info-panel {
+            width: 250px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        h1 { margin: 0 0 10px 0; font-size: 1.5rem; color: var(--accent-green); text-transform: uppercase; letter-spacing: 2px; }
+
+        .status-box {
+            background: #111;
+            padding: 15px;
+            border-radius: 6px;
+            border-left: 4px solid var(--accent-green);
+            margin-bottom: 20px;
+        }
+
+        #score-display { font-size: 1.4rem; font-weight: bold; font-family: 'Courier New', monospace; }
+
+        #speed-display { font-family: monospace; color: var(--accent-green); }
+
+        .controls-hint {
+            background: #111;
+            padding: 10px;
+            border-radius: 6px;
+            font-size: 0.8rem;
+            color: #666;
+            margin-top: auto;
+            border: 1px solid #333;
+        }
+
+        #overlay {
+            position: absolute;
+            inset: 0;
+            background: rgba(0,0,0,0.9);
+            display: none;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 100;
+            text-align: center;
+        }
+        
+        #overlay h2 { color: var(--accent-red); font-size: 2.5rem; margin: 0; letter-spacing: 4px; }
+        
+        button {
+            margin-top: 20px;
+            background: var(--accent-green);
+            border: none;
+            color: white;
+            padding: 12px 30px;
+            border-radius: 4px;
+            font-weight: bold;
+            cursor: pointer;
+            text-transform: uppercase;
+        }
+        button:hover { background: #3d8b40; }
+    </style>
+     <!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-HXK18460W4"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-HXK18460W4');
+</script>
+</head>
+<body>
+
+    <div id="game-container">
+        <div id="viewport">
+            <div class="receipt-scroll" id="bg-scroll"></div>
+            <div id="player"></div>
+            
+            <div id="overlay">
+                <h2>VOIDED</h2>
+                <p id="final-total" style="font-family: monospace;">Total: $0.00</p>
+                <button onclick="location.reload()">RE-PRINT</button>
+            </div>
+        </div>
+
+        <div class="info-panel">
+            <h1>Grocery Pro <span style="font-size: 0.8rem; vertical-align: middle;">Runner</span></h1>
+            
+            <div class="status-box">
+                <div style="font-size: 0.7rem; color: #666; letter-spacing: 1px;">CURRENT TOTAL</div>
+                <div id="score-display">$0.00</div>
+            </div>
+
+            <div class="status-box" style="border-left-color: #555;">
+                <div style="font-size: 0.7rem; color: #666; letter-spacing: 1px;">PRINT SPEED</div>
+                <div id="speed-display">1.00x</div>
+            </div>
+
+            <div class="controls-hint">
+                <span style="color: #999;">INPUT:</span><br>
+                LEFT / RIGHT ARROWS<br>
+                <small>Avoid the groceries to keep the receipt clean.</small>
+            </div>
+        </div>
+    </div>
+
+<script>
+    // --- 1. SPRITE CONFIGURATION ---
+    // Update these filenames to match your local files!
+    const OBSTACLE_SPRITES = [
+        'materials/milk.png',
+        'materials/bread.png',
+        'materials/meat.png',
+        'materials/veggies.png',
+        'materials/eggs.png'
+    ];
+
+    // --- AUDIO ENGINE ---
+    const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    function playSfx(freq, type, duration) {
+        try {
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.type = type;
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+            osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+            gain.gain.setValueAtTime(0.05, audioCtx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + duration);
+            osc.start();
+            osc.stop(audioCtx.currentTime + duration);
+        } catch(e) {}
+    }
+
+    // --- GAME STATE ---
+    const viewport = document.getElementById('viewport');
+    const playerEl = document.getElementById('player');
+    const bgScroll = document.getElementById('bg-scroll');
+    const scoreEl = document.getElementById('score-display');
+    const speedEl = document.getElementById('speed-display');
+
+    let gameActive = true;
+    let score = 0;
+    let speedMultiplier = 1.0; 
+    let lastTime = 0;
+    let spawnTimer = 0;
+
+    const player = {
+        x: 152,
+        y: 465, // Bottom area of receipt
+        w: 35,  // Hitbox slightly smaller than visual
+        h: 40,
+        speed: 6
+    };
+
+    const keys = {};
+    const obstacles = [];
+
+    window.addEventListener('keydown', e => keys[e.code] = true);
+    window.addEventListener('keyup', e => keys[e.code] = false);
+
+    function spawnObstacle() {
+        const sprite = OBSTACLE_SPRITES[Math.floor(Math.random() * OBSTACLE_SPRITES.length)];
+        const price = (Math.random() * 15 + 0.99).toFixed(2);
+        
+        const el = document.createElement('div');
+        el.className = 'obstacle';
+        el.style.backgroundImage = `url('${sprite}')`;
+        viewport.appendChild(el);
+
+        const x = Math.random() * (viewport.offsetWidth - 60);
+        
+        obstacles.push({
+            el: el,
+            x: x,
+            y: -60,
+            w: 45, // Hitbox width
+            h: 45, // Hitbox height
+            price: parseFloat(price)
+        });
+    }
+
+    function update(timestamp) {
+        if (!gameActive) return;
+
+        const deltaTime = timestamp - lastTime;
+        lastTime = timestamp;
+
+        // 1. Gradually increase difficulty
+        // Starts slow, increases every frame
+        speedMultiplier += 0.00015 * (deltaTime / 16); 
+        const currentFallSpeed = 3.5 * speedMultiplier;
+        
+        // Update background animation speed
+        const animDuration = 4 / speedMultiplier;
+        bgScroll.style.setProperty('--scroll-speed', `${animDuration}s`);
+        speedEl.innerText = speedMultiplier.toFixed(2) + 'x';
+
+        // 2. Movement
+        if (keys['ArrowLeft'] && player.x > 5) player.x -= player.speed;
+        if (keys['ArrowRight'] && player.x < viewport.offsetWidth - player.w - 5) player.x += player.speed;
+        playerEl.style.left = player.x + 'px';
+
+        // 3. Procedural Spawning
+        spawnTimer += deltaTime;
+        // Spawning gets faster as the game speeds up
+        if (spawnTimer > (1200 / speedMultiplier)) {
+            spawnObstacle();
+            spawnTimer = 0;
+        }
+
+        // 4. Update Obstacles & Collision
+        for (let i = obstacles.length - 1; i >= 0; i--) {
+            const o = obstacles[i];
+            o.y += currentFallSpeed;
+            
+            o.el.style.top = o.y + 'px';
+            o.el.style.left = o.x + 'px';
+
+            // AABB Collision Detection
+            if (player.x < o.x + o.w &&
+                player.x + player.w > o.x &&
+                player.y < o.y + o.h &&
+                player.y + player.h > o.y) {
+                gameOver();
+            }
+
+            // Cleanup & Scoring
+            if (o.y > viewport.offsetHeight) {
+                score += o.price;
+                scoreEl.innerText = `$${score.toFixed(2)}`;
+                playSfx(600, 'sine', 0.1); // Soft "passed item" sound
+                o.el.remove();
+                obstacles.splice(i, 1);
+            }
+        }
+
+        requestAnimationFrame(update);
+    }
+
+    function gameOver() {
+        gameActive = false;
+        playSfx(100, 'sawtooth', 0.4); // Crash sound
+        document.getElementById('overlay').style.display = 'flex';
+        document.getElementById('final-total').innerText = `TOTAL: $${score.toFixed(2)}`;
+        bgScroll.style.animationPlayState = 'paused';
+    }
+
+    // Start Game Loop
+    requestAnimationFrame(update);
+</script>
+</body>
+</html>

@@ -1,0 +1,539 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Google Tag Manager -->
+    <script>
+    (function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+    new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+    j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+    'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+    })(window,document,'script','dataLayer','GTM-K2MKRGPZ');
+    </script>
+    <title>MAHJONG // ELITE PROTOCOL</title>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=JetBrains+Mono:wght@300;500&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --bg-color: #05070a;
+            --panel-color: #0f1218;
+            --accent-glow: #00f2ff;
+            --accent-dim: #00666b;
+            --text-main: #e0faff;
+            --tile-bg: #161b22;
+            --border-ui: #1d2b3a;
+        }
+
+        body {
+            margin: 0;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            font-family: 'JetBrains Mono', monospace;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            overflow: hidden;
+            cursor: default;
+        }
+
+        #game-container {
+            display: flex;
+            gap: 20px;
+            padding: 25px;
+            background: var(--panel-color);
+            border: 1px solid var(--border-ui);
+            border-radius: 4px;
+            box-shadow: 0 0 50px rgba(0,0,0,0.5), inset 0 0 20px rgba(0, 242, 255, 0.05);
+            position: relative;
+        }
+
+        /* Decorative Corners */
+        #game-container::before, #game-container::after {
+            content: ''; position: absolute; width: 20px; height: 20px;
+            border: 2px solid var(--accent-glow);
+        }
+        #game-container::before { top: -2px; left: -2px; border-right: 0; border-bottom: 0; }
+        #game-container::after { bottom: -2px; right: -2px; border-left: 0; border-top: 0; }
+
+        .board-wrapper {
+            position: relative;
+            background: #000;
+            border: 1px solid #222;
+            line-height: 0;
+        }
+
+        canvas#mahjong {
+            background: radial-gradient(circle at center, #0a1118 0%, #000 100%);
+            display: block;
+        }
+
+        /* --- OVERLAY --- */
+        #overlay {
+            position: absolute;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.9);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 100;
+            backdrop-filter: blur(10px);
+        }
+
+        #overlay h2 { 
+            font-family: 'Orbitron', sans-serif;
+            font-size: 2rem; 
+            color: var(--accent-glow); 
+            margin-bottom: 40px; 
+            letter-spacing: 12px;
+            text-shadow: 0 0 20px rgba(0, 242, 255, 0.5);
+        }
+
+        button.primary {
+            background: transparent;
+            color: var(--accent-glow);
+            padding: 15px 50px;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 0.9rem;
+            letter-spacing: 4px;
+            border: 1px solid var(--accent-glow);
+            cursor: pointer;
+            transition: all 0.4s ease;
+            position: relative;
+        }
+
+        button.primary:hover {
+            background: var(--accent-glow);
+            color: #000;
+            box-shadow: 0 0 30px var(--accent-glow);
+        }
+
+        /* --- DASHBOARD --- */
+        .info-panel {
+            width: 300px;
+            display: flex;
+            flex-direction: column;
+            border-left: 1px solid var(--border-ui);
+            padding-left: 20px;
+        }
+
+        .system-header {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1rem;
+            color: var(--accent-glow);
+            margin-bottom: 25px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .status-box {
+            background: rgba(255,255,255,0.02);
+            padding: 20px;
+            border: 1px solid var(--border-ui);
+            margin-bottom: 20px;
+            position: relative;
+        }
+
+        .score-display {
+            font-size: 2.2rem;
+            font-weight: 300;
+            color: var(--accent-glow);
+            text-shadow: 0 0 10px rgba(0, 242, 255, 0.3);
+        }
+
+        .stat-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .stat-card {
+            background: rgba(0,0,0,0.3);
+            padding: 12px;
+            border: 1px solid #1d2b3a;
+        }
+
+        .stat-label { font-size: 10px; color: #557; text-transform: uppercase; letter-spacing: 1px; }
+        .stat-value { font-size: 1.1rem; color: #fff; margin-top: 5px; }
+
+        .log-container {
+            flex-grow: 1;
+            font-size: 11px;
+            color: #4e6b70;
+            overflow: hidden;
+            mask-image: linear-gradient(to bottom, black 80%, transparent 100%);
+        }
+
+        .log-entry { margin-bottom: 5px; border-left: 2px solid var(--accent-dim); padding-left: 8px; }
+
+        .controls { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 20px; }
+
+        button.sec {
+            background: #111;
+            border: 1px solid var(--border-ui);
+            color: #668;
+            padding: 10px;
+            font-size: 11px;
+            cursor: pointer;
+            text-transform: uppercase;
+            transition: 0.2s;
+        }
+
+        button.sec:hover { border-color: var(--accent-glow); color: var(--accent-glow); }
+
+        .scanline {
+            position: absolute; width: 100%; height: 2px;
+            background: rgba(0, 242, 255, 0.1);
+            top: 0; left: 0; pointer-events: none;
+            animation: scan 4s linear infinite;
+        }
+
+        @keyframes scan { 0% { top: 0% } 100% { top: 100% } }
+    </style>
+     <!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-HXK18460W4"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-HXK18460W4');
+</script>
+</head>
+<body>
+
+    <div id="game-container">
+        <div class="board-wrapper">
+            <canvas id="mahjong" width="850" height="650"></canvas>
+            <div class="scanline"></div>
+            
+            <div id="overlay">
+                <h2>NEURAL LINK</h2>
+                <button class="primary" onclick="startGame()">INITIATE PHASE</button>
+            </div>
+        </div>
+
+        <div class="info-panel">
+            <div class="system-header">
+                <span>SYS_64 // OPS</span>
+                <span style="font-size: 0.6rem; opacity: 0.5;">v4.0.2</span>
+            </div>
+            
+            <div class="status-box">
+                <div class="stat-label">SYNC_EFFICIENCY</div>
+                <div id="score" class="score-display">000000</div>
+            </div>
+
+            <div class="stat-grid">
+                <div class="stat-card">
+                    <div class="stat-label">NODES</div>
+                    <div id="tiles-left" class="stat-value">144</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">UPTIME</div>
+                    <div id="timer" class="stat-value">00:00</div>
+                </div>
+            </div>
+
+            <div id="log" class="log-container"></div>
+
+            <div class="controls">
+                <button class="sec" onclick="findHint()">Analyze</button>
+                <button class="sec" onclick="location.reload()">Reset</button>
+            </div>
+        </div>
+    </div>
+
+<script>
+    const canvas = document.getElementById('mahjong');
+    const ctx = canvas.getContext('2d');
+
+    const TILE_W = 44;
+    const TILE_H = 58;
+    const ISO_X = 5; 
+    const ISO_Y = 7; 
+    
+    // Cyberpunk themed shapes
+    const COLORS = {
+        'A': '#00f2ff', 'B': '#7000ff', 'C': '#ff0070',
+        'D': '#00ff41', 'E': '#ffcf00', 'F': '#ffffff', 'G': '#ff5f00'
+    };
+
+    let tiles = [];
+    let animations = [];
+    let linkLines = []; // Special storage for the match connection animation
+    let selected = null;
+    let score = 0;
+    let startTime;
+    let running = false;
+    let audioCtx;
+
+    function initAudio() {
+        if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    }
+
+    function playSfx(f, d=0.1, type='sine', gVal=0.05) {
+        if (!audioCtx) return;
+        const o = audioCtx.createOscillator();
+        const g = audioCtx.createGain();
+        o.type = type;
+        o.frequency.setValueAtTime(f, audioCtx.currentTime);
+        g.gain.setValueAtTime(gVal, audioCtx.currentTime);
+        g.gain.exponentialRampToValueAtTime(0.00001, audioCtx.currentTime + d);
+        o.connect(g); g.connect(audioCtx.destination);
+        o.start(); o.stop(audioCtx.currentTime + d);
+    }
+
+    function createLayout() {
+        const layout = [];
+        const addLayer = (z, rows, cols, ox, oy) => {
+            for(let r=0; r<rows; r++) {
+                for(let c=0; c<cols; c++) {
+                    // Logic to create the "Turtle" pyramid shape
+                    if (z === 0) {
+                        if ((r===0 || r===7) && (c<3 || c>8)) continue;
+                        if ((r===1 || r===6) && (c<1 || c>10)) continue;
+                    }
+                    layout.push({ x: c + ox, y: r + oy, z });
+                }
+            }
+        };
+        addLayer(0, 8, 12, 1.5, 1);
+        addLayer(1, 6, 8, 3.5, 2);
+        addLayer(2, 4, 6, 4.5, 3);
+        addLayer(3, 2, 4, 5.5, 4);
+        layout.push({ x: 7, y: 4.5, z: 4 });
+        return layout.slice(0, 144);
+    }
+
+    function isFree(t) {
+        if (t.matched) return false;
+        // Check for tiles directly on top
+        const above = tiles.some(o => !o.matched && o.z === t.z + 1 && Math.abs(o.x - t.x) < 1 && Math.abs(o.y - t.y) < 1);
+        if (above) return false;
+        // Check left/right blockage
+        const l = tiles.some(o => !o.matched && o.z === t.z && o.x === t.x - 1 && Math.abs(o.y - t.y) < 1);
+        const r = tiles.some(o => !o.matched && o.z === t.z && o.x === t.x + 1 && Math.abs(o.y - t.y) < 1);
+        return !l || !r;
+    }
+
+    function drawTile(t, alpha = 1, scale = 1, isHint = false) {
+        const px = 100 + t.x * TILE_W - (t.z * ISO_X);
+        const py = 60 + t.y * TILE_H - (t.z * ISO_Y);
+        const isSel = (selected && selected.id === t.id) || isHint;
+        
+        ctx.save();
+        ctx.globalAlpha = alpha;
+        
+        if (scale !== 1) {
+            ctx.translate(px + TILE_W/2, py + TILE_H/2);
+            ctx.scale(scale, scale);
+            ctx.translate(-(px + TILE_W/2), -(py + TILE_H/2));
+        }
+
+        // Selection / Hint Glow
+        if (isSel) {
+            ctx.shadowColor = isHint ? '#ff0070' : varColor('--accent-glow');
+            ctx.shadowBlur = 15;
+        }
+
+        // Depth Side
+        ctx.fillStyle = '#0a0d12';
+        ctx.beginPath();
+        ctx.roundRect(px + ISO_X, py + ISO_Y, TILE_W, TILE_H, 2);
+        ctx.fill();
+
+        // Main Body
+        const grad = ctx.createLinearGradient(px, py, px + TILE_W, py + TILE_H);
+        grad.addColorStop(0, isSel ? '#1a2a3a' : '#161b22');
+        grad.addColorStop(1, '#05070a');
+        ctx.fillStyle = grad;
+        ctx.strokeStyle = isSel ? varColor('--accent-glow') : '#2a3a4a';
+        ctx.lineWidth = isSel ? 2 : 1;
+        
+        ctx.beginPath();
+        ctx.roundRect(px, py, TILE_W, TILE_H, 2);
+        ctx.fill();
+        ctx.stroke();
+
+        // Icon/Symbol (Simplified tech patterns)
+        ctx.strokeStyle = COLORS[t.type];
+        ctx.lineWidth = 2;
+        ctx.globalAlpha = alpha * 0.8;
+        ctx.beginPath();
+        const cx = px + TILE_W/2;
+        const cy = py + TILE_H/2;
+        const s = 8;
+
+        if (t.type === 'A') { ctx.rect(cx-s, cy-s, s*2, s*2); }
+        else if (t.type === 'B') { ctx.moveTo(cx, cy-s); ctx.lineTo(cx+s, cy+s); ctx.lineTo(cx-s, cy+s); ctx.closePath(); }
+        else if (t.type === 'C') { ctx.arc(cx, cy, s, 0, Math.PI*2); }
+        else if (t.type === 'D') { ctx.moveTo(cx-s, cy); ctx.lineTo(cx+s, cy); ctx.moveTo(cx, cy-s); ctx.lineTo(cx, cy+s); }
+        else if (t.type === 'E') { ctx.moveTo(cx-s, cy-s); ctx.lineTo(cx+s, cy+s); ctx.moveTo(cx+s, cy-s); ctx.lineTo(cx-s, cy+s); }
+        else if (t.type === 'F') { ctx.moveTo(cx-s, cy-s); ctx.lineTo(cx, cy+s); ctx.lineTo(cx+s, cy-s); }
+        else { ctx.rect(cx-4, cy-4, 8, 8); ctx.stroke(); ctx.rect(cx-10, cy-10, 20, 20); }
+        
+        ctx.stroke();
+        ctx.restore();
+    }
+
+    function varColor(name) {
+        return getComputedStyle(document.documentElement).getPropertyValue(name).trim();
+    }
+
+    function addLog(msg) {
+        const log = document.getElementById('log');
+        const entry = document.createElement('div');
+        entry.className = "log-entry";
+        entry.innerText = `[${new Date().toLocaleTimeString().split(' ')[0]}] ${msg}`;
+        log.prepend(entry);
+    }
+
+    function startGame() {
+        initAudio();
+        document.getElementById('overlay').style.display = 'none';
+        
+        const deck = [];
+        const types = Object.keys(COLORS);
+        for(let i=0; i<36; i++) {
+            const type = types[i % types.length];
+            const variant = Math.floor(i / types.length) % 4;
+            for(let j=0; j<4; j++) deck.push({ type, variant });
+        }
+        deck.sort(() => Math.random() - 0.5);
+        
+        const layout = createLayout();
+        tiles = layout.map((pos, i) => ({ ...pos, ...deck[i], id: i, matched: false }));
+        
+        animations = [];
+        linkLines = [];
+        score = 0; 
+        startTime = Date.now(); 
+        running = true;
+        
+        addLog("NEURAL LINK ESTABLISHED");
+        addLog("SCANNING NODE TOPOLOGY...");
+        loop();
+    }
+
+    function findHint() {
+        const free = tiles.filter(t => isFree(t));
+        for(let i=0; i<free.length; i++) {
+            for(let j=i+1; j<free.length; j++) {
+                if (free[i].type === free[j].type && free[i].variant === free[j].variant) {
+                    selected = free[i];
+                    playSfx(800, 0.2, 'triangle', 0.03);
+                    addLog("CLUSTER MATCH FOUND");
+                    return;
+                }
+            }
+        }
+        addLog("NO VALID MOVES DETECTED");
+    }
+
+    canvas.addEventListener('mousedown', (e) => {
+        if (!running) return;
+        const rect = canvas.getBoundingClientRect();
+        const mx = e.clientX - rect.left;
+        const my = e.clientY - rect.top;
+        
+        const clicked = tiles
+            .filter(t => !t.matched)
+            .sort((a,b) => b.z - a.z || b.y - a.y || b.x - a.x)
+            .find(t => {
+                const px = 100 + t.x * TILE_W - (t.z * ISO_X);
+                const py = 60 + t.y * TILE_H - (t.z * ISO_Y);
+                return mx >= px && mx <= px + TILE_W && my >= py && my <= py + TILE_H;
+            });
+
+        if (clicked && isFree(clicked)) {
+            if (selected && selected.id !== clicked.id && selected.type === clicked.type && selected.variant === clicked.variant) {
+                // MATCH SUCCESS
+                const t1 = selected;
+                const t2 = clicked;
+                t1.matched = t2.matched = true;
+                
+                // Add the connecting line animation
+                const getCenter = (t) => ({
+                    x: 100 + t.x * TILE_W - (t.z * ISO_X) + TILE_W/2,
+                    y: 60 + t.y * TILE_H - (t.z * ISO_Y) + TILE_H/2
+                });
+                const c1 = getCenter(t1);
+                const c2 = getCenter(t2);
+
+                linkLines.push({ x1: c1.x, y1: c1.y, x2: c2.x, y2: c2.y, life: 1.0 });
+                animations.push({ t: {...t1}, life: 1.0 });
+                animations.push({ t: {...t2}, life: 1.0 });
+
+                score += 1250;
+                playSfx(500, 0.4, 'sine', 0.08);
+                playSfx(1000, 0.1, 'sine', 0.05);
+                addLog(`LINK RESOLVED: +1250`);
+                selected = null;
+            } else {
+                selected = clicked;
+                playSfx(600, 0.05, 'sine', 0.03);
+            }
+        } else if (clicked) {
+            playSfx(100, 0.2, 'sawtooth', 0.03);
+            addLog("NODE ACCESS DENIED");
+        }
+    });
+
+    function loop() {
+        if (!running) return;
+        
+        // Update stats
+        const elapsed = Math.floor((Date.now() - startTime) / 1000);
+        document.getElementById('timer').innerText = `${Math.floor(elapsed/60).toString().padStart(2,'0')}:${(elapsed%60).toString().padStart(2,'0')}`;
+        document.getElementById('score').innerText = score.toString().padStart(6, '0');
+        document.getElementById('tiles-left').innerText = tiles.filter(t => !t.matched).length;
+
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        
+        // Draw static tiles
+        tiles.filter(t => !t.matched)
+             .sort((a,b) => a.z - b.z || a.y - b.y || a.x - b.x)
+             .forEach(t => drawTile(t));
+
+        // Draw Line Connections (Data Links)
+        ctx.save();
+        for (let i = linkLines.length - 1; i >= 0; i--) {
+            const l = linkLines[i];
+            ctx.strokeStyle = varColor('--accent-glow');
+            ctx.lineWidth = 3 * l.life;
+            ctx.globalAlpha = l.life;
+            ctx.shadowBlur = 15;
+            ctx.shadowColor = varColor('--accent-glow');
+            
+            // Draw a "digital" dashed line
+            ctx.setLineDash([10, 5]);
+            ctx.lineDashOffset = -l.life * 50;
+            
+            ctx.beginPath();
+            ctx.moveTo(l.x1, l.y1);
+            ctx.lineTo(l.x2, l.y2);
+            ctx.stroke();
+            
+            l.life -= 0.025;
+            if (l.life <= 0) linkLines.splice(i, 1);
+        }
+        ctx.restore();
+
+        // Draw Tile Dissolve Animations
+        for (let i = animations.length - 1; i >= 0; i--) {
+            const anim = animations[i];
+            drawTile(anim.t, anim.life, 1 + (1 - anim.life) * 0.5);
+            anim.life -= 0.04;
+            if (anim.life <= 0) animations.splice(i, 1);
+        }
+
+        requestAnimationFrame(loop);
+    }
+</script>
+</body>
+</html>

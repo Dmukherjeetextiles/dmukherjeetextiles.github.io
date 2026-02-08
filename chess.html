@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Google Tag Manager -->
+    <script>
+    (function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+    new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+    j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+    'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+    })(window,document,'script','dataLayer','GTM-K2MKRGPZ');
+    </script>
+    <title>Chess Pro | 1 Vs 1</title>
+    
+    <!-- Dependencies -->
+    <link rel="stylesheet" href="https://unpkg.com/@chrisoakman/chessboardjs@1.0.0/dist/chessboard-1.0.0.min.css">
+    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+    <script src="https://unpkg.com/@chrisoakman/chessboardjs@1.0.0/dist/chessboard-1.0.0.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/chess.js/0.10.3/chess.min.js"></script>
+
+    <style>
+        :root {
+            --bg-color: #1a1a1a;
+            --panel-color: #252525;
+            --accent-green: #4CAF50;
+            --accent-red: #ff3e3e;
+            --text-main: #ffffff;
+            --board-dark: #2c3e50;
+            --board-light: #95a5a6;
+        }
+
+        body {
+            margin: 0;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        #game-container {
+            display: flex;
+            gap: 30px;
+            padding: 20px;
+            background: var(--panel-color);
+            border-radius: 12px;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+            border: 1px solid #333;
+            max-width: 95vw;
+        }
+
+        /* Chessboard Customization */
+        #myBoard {
+            width: 500px;
+            border: 5px solid #111;
+            border-radius: 4px;
+        }
+        /* Override chessboard.js default colors */
+        .black-3c85d { background-color: var(--board-dark) !important; }
+        .white-1e1d7 { background-color: var(--board-light) !important; }
+
+        .info-panel {
+            width: 300px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        h1 { margin: 0 0 10px 0; font-size: 1.5rem; color: var(--accent-green); text-transform: uppercase; letter-spacing: 2px; }
+
+        .status-box {
+            background: #111;
+            padding: 15px;
+            border-radius: 6px;
+            border-left: 4px solid var(--accent-green);
+            margin-bottom: 20px;
+        }
+
+        #status { font-weight: bold; font-size: 1.1rem; }
+
+        .move-history {
+            flex-grow: 1;
+            background: #111;
+            padding: 10px;
+            border-radius: 6px;
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 0.85rem;
+            color: #aaa;
+            overflow-y: auto;
+            max-height: 250px;
+            border: 1px solid #333;
+        }
+
+        .controls { margin-top: 20px; display: flex; gap: 10px; }
+
+        button {
+            flex: 1;
+            background: var(--accent-green);
+            border: none;
+            color: white;
+            padding: 12px;
+            border-radius: 4px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: transform 0.1s, background 0.2s;
+        }
+        button:hover { background: #3d8b40; }
+        button:active { transform: scale(0.95); }
+        button.secondary { background: #444; }
+
+        /* Game Over Overlay */
+        #overlay {
+            position: absolute;
+            inset: 0;
+            background: rgba(0,0,0,0.85);
+            display: none; /* Controlled by JS */
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 100;
+            border-radius: 12px;
+        }
+        #overlay h2 { font-size: 3rem; color: var(--accent-red); margin-bottom: 10px; }
+    </style>
+     <!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-HXK18460W4"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-HXK18460W4');
+</script>
+</head>
+<body>
+
+    <div id="game-container">
+        <!-- The Board -->
+        <div style="position: relative;">
+            <div id="myBoard"></div>
+            <div id="overlay">
+                <h2 id="overlay-msg">CHECKMATE</h2>
+                <button onclick="resetGame()" style="width: 200px;">PLAY AGAIN</button>
+            </div>
+        </div>
+
+        <!-- The UI -->
+        <div class="info-panel">
+            <h1>Chess Pro</h1>
+            
+            <div class="status-box">
+                <div id="status">White to move</div>
+            </div>
+
+            <div style="margin-bottom: 5px; font-size: 0.8rem; color: #666;">LOGS:</div>
+            <div id="pgn" class="move-history"></div>
+
+            <div class="controls">
+                <button onclick="resetGame()">RESET</button>
+                <button class="secondary" onclick="board.flip()">FLIP</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // --- AUDIO ENGINE ---
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        
+        function playSfx(type) {
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+
+            const now = audioCtx.currentTime;
+
+            if (type === 'move') {
+                osc.type = 'triangle';
+                osc.frequency.setValueAtTime(400, now);
+                osc.frequency.exponentialRampToValueAtTime(200, now + 0.1);
+                gain.gain.setValueAtTime(0.1, now);
+                gain.gain.linearRampToValueAtTime(0, now + 0.1);
+                osc.start();
+                osc.stop(now + 0.1);
+            } 
+            else if (type === 'capture') {
+                osc.type = 'square';
+                osc.frequency.setValueAtTime(600, now);
+                osc.frequency.exponentialRampToValueAtTime(300, now + 0.15);
+                gain.gain.setValueAtTime(0.1, now);
+                gain.gain.linearRampToValueAtTime(0, now + 0.15);
+                osc.start();
+                osc.stop(now + 0.15);
+            }
+            else if (type === 'check') {
+                osc.type = 'sawtooth';
+                osc.frequency.setValueAtTime(150, now);
+                osc.frequency.linearRampToValueAtTime(250, now + 0.1);
+                osc.frequency.linearRampToValueAtTime(150, now + 0.2);
+                gain.gain.setValueAtTime(0.05, now);
+                gain.gain.linearRampToValueAtTime(0, now + 0.2);
+                osc.start();
+                osc.stop(now + 0.2);
+            }
+        }
+
+        // --- GAME LOGIC ---
+        var board = null;
+        var game = new Chess();
+        var $status = $('#status');
+        var $pgn = $('#pgn');
+        var $overlay = $('#overlay');
+
+        function onDragStart (source, piece, position, orientation) {
+            if (game.game_over()) return false;
+            if ((game.turn() === 'w' && piece.search(/^b/) !== -1) ||
+                (game.turn() === 'b' && piece.search(/^w/) !== -1)) {
+                return false;
+            }
+        }
+
+        function onDrop (source, target) {
+            var move = game.move({
+                from: source,
+                to: target,
+                promotion: 'q'
+            });
+
+            if (move === null) return 'snapback';
+
+            // Play Sounds based on move result
+            if (move.captured) {
+                playSfx('capture');
+            } else {
+                playSfx('move');
+            }
+
+            if (game.in_check()) {
+                playSfx('check');
+            }
+
+            updateStatus();
+        }
+
+        function onSnapEnd () {
+            board.position(game.fen());
+        }
+
+        function updateStatus () {
+            var status = '';
+            var moveColor = (game.turn() === 'b') ? 'Black' : 'White';
+
+            if (game.in_checkmate()) {
+                status = 'Game over, ' + moveColor + ' is in checkmate.';
+                showGameOver('CHECKMATE');
+            } else if (game.in_draw()) {
+                status = 'Game over, drawn position';
+                showGameOver('DRAW');
+            } else {
+                status = moveColor + ' to move';
+                if (game.in_check()) {
+                    status += ' (CHECK)';
+                }
+            }
+
+            $status.html(status);
+            $pgn.html(game.pgn());
+            $pgn.scrollTop($pgn[0].scrollHeight);
+        }
+
+        function showGameOver(msg) {
+            $('#overlay-msg').text(msg);
+            $overlay.css('display', 'flex').hide().fadeIn(300);
+        }
+
+        function resetGame() {
+            game.reset();
+            board.start();
+            $overlay.fadeOut(200);
+            updateStatus();
+        }
+
+        var config = {
+            draggable: true,
+            position: 'start',
+            onDragStart: onDragStart,
+            onDrop: onDrop,
+            onSnapEnd: onSnapEnd,
+            pieceTheme: 'https://chessboardjs.com/img/chesspieces/wikipedia/{piece}.png'
+        };
+        
+        board = Chessboard('myBoard', config);
+        updateStatus();
+
+        // Responsive handling
+        $(window).resize(board.resize);
+
+    </script>
+</body>
+</html>

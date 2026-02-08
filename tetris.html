@@ -1,0 +1,560 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Google Tag Manager -->
+    <script>
+    (function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+    new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+    j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+    'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+    })(window,document,'script','dataLayer','GTM-K2MKRGPZ');
+    </script>
+    <title>Tetris Pro | Arcade Series</title>
+    
+    <style>
+        :root {
+            --bg-color: #1a1a1a;
+            --panel-color: #252525;
+            --accent-green: #4CAF50;
+            --accent-red: #ff3e3e;
+            --accent-blue: #2196F3;
+            --text-main: #ffffff;
+            --board-bg: #000;
+            --border-color: #333;
+        }
+
+        body {
+            margin: 0;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        #game-container {
+            display: flex;
+            gap: 30px;
+            padding: 20px;
+            background: var(--panel-color);
+            border-radius: 12px;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+            border: 1px solid var(--border-color);
+            max-width: 95vw;
+        }
+
+        /* --- BOARD SECTION --- */
+        .board-wrapper {
+            position: relative;
+            background: #000;
+            padding: 5px;
+            border-radius: 6px;
+            border: 5px solid #111;
+            box-shadow: inset 0 0 20px rgba(0,0,0,1);
+        }
+
+        canvas#tetris {
+            background: var(--board-bg);
+            display: block;
+            image-rendering: pixelated;
+        }
+
+        /* --- OVERLAY --- */
+        #overlay {
+            position: absolute;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.9);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 100;
+            border-radius: 4px;
+            backdrop-filter: blur(4px);
+            text-align: center;
+        }
+
+        #overlay h2 { 
+            font-size: 1.8rem; 
+            color: white; 
+            margin-bottom: 25px; 
+            letter-spacing: 4px;
+            font-weight: 300;
+            text-transform: uppercase;
+        }
+
+        /* --- DASHBOARD SECTION --- */
+        .info-panel {
+            width: 300px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        h1 { 
+            margin: 0 0 10px 0; 
+            font-size: 1.4rem; 
+            color: var(--accent-green); 
+            text-transform: uppercase; 
+            letter-spacing: 3px; 
+        }
+
+        .status-box {
+            background: #111;
+            padding: 15px;
+            border-radius: 6px;
+            border-left: 4px solid var(--accent-green);
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .score-display {
+            font-family: 'JetBrains Mono', 'Courier New', monospace;
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: var(--accent-green);
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+
+        .stat-card {
+            background: #111;
+            padding: 12px;
+            border-radius: 4px;
+            text-align: center;
+            border: 1px solid var(--border-color);
+        }
+
+        .stat-label { font-size: 0.65rem; color: #666; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 5px; }
+        .stat-value { font-size: 1.1rem; font-weight: bold; font-family: monospace; }
+
+        .next-preview {
+            width: 60px;
+            height: 60px;
+            background: #000;
+            margin: 5px auto 0;
+            border-radius: 4px;
+        }
+
+        .move-history {
+            flex-grow: 1;
+            background: #0a0a0a;
+            padding: 12px;
+            border-radius: 6px;
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 0.8rem;
+            color: #888;
+            overflow-y: auto;
+            max-height: 180px;
+            border: 1px solid var(--border-color);
+            line-height: 1.4;
+        }
+
+        /* --- BUTTONS --- */
+        .controls { margin-top: 20px; display: flex; gap: 10px; }
+
+        button {
+            background: #333;
+            border: none;
+            color: white;
+            padding: 10px 15px;
+            border-radius: 4px;
+            font-weight: bold;
+            font-size: 0.75rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            flex: 1;
+        }
+
+        button:hover { background: #444; }
+
+        /* Specific Primary Style for the Start Button */
+        button.primary {
+            background: var(--accent-green);
+            color: white;
+            padding: 12px 24px;
+            font-size: 0.85rem;
+            flex: none; /* Prevents stretching in overlay */
+            width: auto;
+            min-width: 180px;
+        }
+
+        button.primary:hover {
+            background: #3d8b40;
+            box-shadow: 0 0 15px rgba(76, 175, 80, 0.3);
+        }
+
+        button:active { transform: scale(0.98); }
+
+        .hint-text {
+            font-size: 0.65rem;
+            color: #555;
+            margin-top: 15px;
+            text-align: center;
+            line-height: 1.6;
+        }
+    </style>
+     <!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-HXK18460W4"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-HXK18460W4');
+</script>
+</head>
+<body>
+
+    <div id="game-container">
+        <!-- Board Section -->
+        <div class="board-wrapper">
+            <canvas id="tetris" width="300" height="600"></canvas>
+            
+            <div id="overlay">
+                <h2 id="overlay-msg">Tetris Pro</h2>
+                <button class="primary" onclick="startGame()">Commence Sequence</button>
+                <div class="hint-text">
+                    SYSTEM READY<br>
+                    INPUT: KEYBOARD ARROWS
+                </div>
+            </div>
+        </div>
+
+        <!-- Dashboard Section -->
+        <div class="info-panel">
+            <h1>Tetris Pro</h1>
+            
+            <div class="status-box">
+                <div class="stat-label" style="margin:0">Score</div>
+                <div id="score" class="score-display">000000</div>
+            </div>
+
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-label">Lines</div>
+                    <div id="lines" class="stat-value">0</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Next</div>
+                    <canvas id="next" class="next-preview" width="60" height="60"></canvas>
+                </div>
+            </div>
+
+            <div style="margin-bottom: 5px; font-size: 0.7rem; color: #555; letter-spacing: 1px;">SEQUENCE LOG:</div>
+            <div id="log" class="move-history"></div>
+
+            <div class="controls">
+                <button onclick="location.reload()">Reset</button>
+                <button id="pause-btn">Pause</button>
+            </div>
+            
+            <div class="hint-text">
+                ARROWS: Move & Rotate<br>
+                SPACE: Hard Drop
+            </div>
+        </div>
+    </div>
+
+<script>
+    // --- AUDIO ENGINE ---
+    let audioCtx;
+
+    function initAudio() {
+        if (!audioCtx) {
+            audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        }
+        if (audioCtx.state === 'suspended') {
+            audioCtx.resume();
+        }
+    }
+
+    function playSfx(type) {
+        if (!audioCtx || audioCtx.state !== 'running') return;
+
+        const now = audioCtx.currentTime;
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+
+        if (type === 'move') {
+            osc.type = 'sine';
+            osc.frequency.setValueAtTime(150, now);
+            gain.gain.setValueAtTime(0.05, now);
+            gain.gain.linearRampToValueAtTime(0, now + 0.05);
+            osc.start(); osc.stop(now + 0.05);
+        } else if (type === 'drop') {
+            osc.type = 'sine';
+            osc.frequency.setValueAtTime(100, now);
+            osc.frequency.linearRampToValueAtTime(50, now + 0.1);
+            gain.gain.setValueAtTime(0.1, now);
+            gain.gain.linearRampToValueAtTime(0, now + 0.1);
+            osc.start(); osc.stop(now + 0.1);
+        } else if (type === 'clear') {
+            osc.type = 'triangle';
+            osc.frequency.setValueAtTime(440, now);
+            osc.frequency.exponentialRampToValueAtTime(880, now + 0.2);
+            gain.gain.setValueAtTime(0.1, now);
+            gain.gain.linearRampToValueAtTime(0, now + 0.2);
+            osc.start(); osc.stop(now + 0.2);
+        } else if (type === 'over') {
+            osc.type = 'sawtooth';
+            osc.frequency.setValueAtTime(100, now);
+            osc.frequency.linearRampToValueAtTime(50, now + 0.5);
+            gain.gain.setValueAtTime(0.1, now);
+            gain.gain.linearRampToValueAtTime(0, now + 0.5);
+            osc.start(); osc.stop(now + 0.5);
+        }
+    }
+
+    // --- TETRIS LOGIC ---
+    const canvas = document.getElementById('tetris');
+    const context = canvas.getContext('2d');
+    const nextCanvas = document.getElementById('next');
+    const nCtx = nextCanvas.getContext('2d');
+    
+    context.scale(30, 30);
+    nCtx.scale(15, 15);
+
+    const colors = [
+        null,
+        '#2196F3', // I
+        '#FF9800', // L
+        '#3F51B5', // J
+        '#FFEB3B', // O
+        '#9C27B0', // T
+        '#4CAF50', // S
+        '#F44336', // Z
+    ];
+
+    const pieces = 'ILJOTSZ';
+
+    function createPiece(type) {
+        if (type === 'I') return [[0,1,0,0],[0,1,0,0],[0,1,0,0],[0,1,0,0]];
+        if (type === 'L') return [[0,2,0],[0,2,0],[0,2,2]];
+        if (type === 'J') return [[0,3,0],[0,3,0],[3,3,0]];
+        if (type === 'O') return [[4,4],[4,4]];
+        if (type === 'T') return [[0,5,0],[5,5,5],[0,0,0]];
+        if (type === 'S') return [[0,6,6],[6,6,0],[0,0,0]];
+        if (type === 'Z') return [[7,7,0],[0,7,7],[0,0,0]];
+    }
+
+    const arena = Array.from({length: 20}, () => Array(10).fill(0));
+    const player = { pos: {x: 0, y: 0}, matrix: null, next: null, score: 0, lines: 0 };
+
+    function drawMatrix(matrix, offset, ctx) {
+        matrix.forEach((row, y) => {
+            row.forEach((value, x) => {
+                if (value !== 0) {
+                    ctx.fillStyle = colors[value];
+                    ctx.fillRect(x + offset.x, y + offset.y, 1, 1);
+                    ctx.strokeStyle = '#111';
+                    ctx.lineWidth = 0.05;
+                    ctx.strokeRect(x + offset.x, y + offset.y, 1, 1);
+                }
+            });
+        });
+    }
+
+    function collide(arena, player) {
+        const [m, o] = [player.matrix, player.pos];
+        for (let y = 0; y < m.length; ++y) {
+            for (let x = 0; x < m[y].length; ++x) {
+                if (m[y][x] !== 0 && (arena[y + o.y] && arena[y + o.y][x + o.x]) !== 0) return true;
+            }
+        }
+        return false;
+    }
+
+    function merge(arena, player) {
+        player.matrix.forEach((row, y) => {
+            row.forEach((value, x) => {
+                if (value !== 0) arena[y + player.pos.y][x + player.pos.x] = value;
+            });
+        });
+    }
+
+    function rotate(matrix, dir) {
+        for (let y = 0; y < matrix.length; ++y) {
+            for (let x = 0; x < y; ++x) [matrix[x][y], matrix[y][x]] = [matrix[y][x], matrix[x][y]];
+        }
+        if (dir > 0) matrix.forEach(row => row.reverse()); else matrix.reverse();
+    }
+
+    function arenaSweep() {
+        let rowCount = 0;
+        outer: for (let y = arena.length - 1; y > 0; --y) {
+            for (let x = 0; x < arena[y].length; ++x) {
+                if (arena[y][x] === 0) continue outer;
+            }
+            const row = arena.splice(y, 1)[0].fill(0);
+            arena.unshift(row);
+            ++y;
+            rowCount++;
+        }
+        if (rowCount > 0) {
+            player.score += (rowCount * 100) * rowCount;
+            player.lines += rowCount;
+            playSfx('clear');
+            addLog(`Cleared ${rowCount} Line(s) [+${(rowCount * 100) * rowCount}]`);
+            updateUI();
+        }
+    }
+
+    function updateUI() {
+        document.getElementById('score').innerText = player.score.toString().padStart(6, '0');
+        document.getElementById('lines').innerText = player.lines;
+        
+        nCtx.fillStyle = '#000';
+        nCtx.fillRect(0,0,4,4);
+        drawMatrix(player.next, {x: 0.5, y: 0.5}, nCtx);
+    }
+
+    function addLog(msg) {
+        const log = document.getElementById('log');
+        const entry = document.createElement('div');
+        entry.style.marginBottom = "4px";
+        entry.innerText = `> ${msg}`;
+        log.appendChild(entry);
+        log.scrollTop = log.scrollHeight;
+    }
+
+    function playerReset() {
+        if (!player.next) player.next = createPiece(pieces[pieces.length * Math.random() | 0]);
+        player.matrix = player.next;
+        player.next = createPiece(pieces[pieces.length * Math.random() | 0]);
+        player.pos.y = 0;
+        player.pos.x = (arena[0].length / 2 | 0) - (player.matrix[0].length / 2 | 0);
+        
+        if (collide(arena, player)) {
+            playSfx('over');
+            addLog("CRITICAL: COLLAPSE");
+            document.getElementById('overlay-msg').innerText = "SEQUENCE TERMINATED";
+            document.getElementById('overlay').style.display = 'flex';
+            running = false;
+        }
+        updateUI();
+    }
+
+    let dropCounter = 0;
+    let dropInterval = 1000;
+    let lastTime = 0;
+    let running = false;
+
+    function update(time = 0) {
+        if (!running) return;
+        const deltaTime = time - lastTime;
+        lastTime = time;
+        dropCounter += deltaTime;
+        if (dropCounter > dropInterval) playerDrop();
+        draw();
+        requestAnimationFrame(update);
+    }
+
+    function draw() {
+        context.fillStyle = '#111';
+        context.fillRect(0, 0, canvas.width, canvas.height);
+        
+        // Grid lines
+        context.strokeStyle = '#1a1a1a';
+        context.lineWidth = 0.02;
+        for(let i=0; i<10; i++) { context.beginPath(); context.moveTo(i,0); context.lineTo(i,20); context.stroke(); }
+        for(let i=0; i<20; i++) { context.beginPath(); context.moveTo(0,i); context.lineTo(10,i); context.stroke(); }
+
+        drawMatrix(arena, {x: 0, y: 0}, context);
+        drawMatrix(player.matrix, player.pos, context);
+    }
+
+    function playerDrop() {
+        player.pos.y++;
+        if (collide(arena, player)) {
+            player.pos.y--;
+            merge(arena, player);
+            playerReset();
+            arenaSweep();
+        } else {
+            // Optional: very light blip on normal drop
+        }
+        dropCounter = 0;
+    }
+
+    function playerMove(dir) {
+        player.pos.x += dir;
+        if (collide(arena, player)) {
+            player.pos.x -= dir;
+        } else {
+            playSfx('move');
+        }
+    }
+
+    function startGame() {
+        initAudio(); // Initialize audio context on click
+        document.getElementById('overlay').style.display = 'none';
+        arena.forEach(row => row.fill(0));
+        player.score = 0;
+        player.lines = 0;
+        document.getElementById('log').innerHTML = '';
+        addLog("Sequence Initialized");
+        playerReset();
+        running = true;
+        update();
+    }
+
+    document.addEventListener('keydown', event => {
+        if (!running) return;
+        if (event.keyCode === 37) playerMove(-1); // Left
+        else if (event.keyCode === 39) playerMove(1);  // Right
+        else if (event.keyCode === 40) playerDrop();   // Down
+        else if (event.keyCode === 38) {               // Up (Rotate)
+            const pos = player.pos.x;
+            let offset = 1;
+            rotate(player.matrix, 1);
+            while (collide(arena, player)) {
+                player.pos.x += offset;
+                offset = -(offset + (offset > 0 ? 1 : -1));
+                if (offset > player.matrix[0].length) {
+                    rotate(player.matrix, -1);
+                    player.pos.x = pos;
+                    return;
+                }
+            }
+            playSfx('move');
+        } else if (event.keyCode === 32) {             // Space (Hard Drop)
+            while(!collide(arena, player)) player.pos.y++;
+            player.pos.y--;
+            merge(arena, player);
+            playSfx('drop');
+            playerReset();
+            arenaSweep();
+        }
+    });
+
+    document.getElementById('pause-btn').addEventListener('click', function() {
+        if (!player.matrix) return; // Prevent pausing if game hasn't started
+        running = !running;
+        if(running) {
+            this.innerText = "Pause";
+            update();
+            addLog("Sequence Resumed");
+        } else {
+            this.innerText = "Resume";
+            addLog("Sequence Suspended");
+        }
+    });
+</script>
+</body>
+</html>

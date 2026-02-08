@@ -1,0 +1,512 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Google Tag Manager -->
+    <script>
+    (function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+    new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+    j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+    'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+    })(window,document,'script','dataLayer','GTM-K2MKRGPZ');
+    </script>
+    <title>Existential Breaker | Project Life</title>
+    
+    <style>
+        :root {
+            --bg-dark: #0f0f0f;
+            --panel-bg: #1a1a1a;
+            --accent-green: #4CAF50;
+            --accent-dim: #2e4d2f;
+            --accent-red: #ff3e3e;
+            --text-main: #e0e0e0;
+            --text-dim: #666;
+            --border: #333;
+        }
+
+        body {
+            margin: 0;
+            background-color: var(--bg-dark);
+            color: var(--text-main);
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        #game-container {
+            display: flex;
+            gap: 2px;
+            background: var(--border);
+            padding: 2px;
+            border-radius: 8px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.7);
+        }
+
+        .canvas-wrapper {
+            position: relative;
+            background: #000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 6px 0 0 6px;
+            overflow: hidden;
+        }
+
+        canvas {
+            background: radial-gradient(circle, #111 0%, #000 100%);
+            cursor: none;
+        }
+
+        .dashboard {
+            width: 320px;
+            background: var(--panel-bg);
+            display: flex;
+            flex-direction: column;
+            padding: 24px;
+            border-radius: 0 6px 6px 0;
+        }
+
+        .header {
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 15px;
+            margin-bottom: 20px;
+        }
+
+        .header h1 {
+            margin: 0;
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            color: var(--accent-green);
+        }
+
+        .score-box {
+            background: #111;
+            padding: 20px;
+            border-radius: 4px;
+            border: 1px solid var(--border);
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .score-label {
+            font-size: 10px;
+            color: var(--text-dim);
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-bottom: 5px;
+        }
+
+        .score-value {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 32px;
+            color: var(--accent-green);
+            text-shadow: 0 0 10px rgba(76, 175, 80, 0.3);
+        }
+
+        .fragment-display {
+            flex-grow: 1;
+            background: #111;
+            border: 1px solid var(--border);
+            border-radius: 4px;
+            padding: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            font-style: italic;
+            font-family: 'Georgia', serif;
+            color: #aaa;
+            font-size: 18px;
+            line-height: 1.4;
+            margin-bottom: 20px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .fragment-display::before {
+            content: "MESSAGE_FRAGMENT";
+            position: absolute;
+            top: 5px;
+            left: 5px;
+            font-family: monospace;
+            font-size: 8px;
+            color: #333;
+            font-style: normal;
+        }
+
+        .stat-group { margin-bottom: 20px; }
+
+        .stat-label {
+            font-size: 10px;
+            color: var(--text-dim);
+            text-transform: uppercase;
+            margin-bottom: 8px;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .meter-bar {
+            height: 4px;
+            background: #111;
+            width: 100%;
+            border-radius: 2px;
+            overflow: hidden;
+        }
+
+        #sanity-fill {
+            height: 100%;
+            width: 100%;
+            background: var(--accent-green);
+            transition: width 0.4s ease, background-color 1s ease;
+        }
+
+        .btn-primary {
+            background: transparent;
+            border: 1px solid var(--accent-green);
+            color: var(--accent-green);
+            padding: 12px;
+            font-size: 11px;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-primary:hover { background: var(--accent-green); color: black; }
+
+        .btn-secondary {
+            background: transparent;
+            border: 1px solid #444;
+            color: #666;
+            padding: 10px;
+            font-size: 10px;
+            text-transform: uppercase;
+            cursor: pointer;
+            width: 100%;
+        }
+
+        #overlay {
+            position: absolute;
+            inset: 0;
+            background: rgba(0,0,0,0.85);
+            backdrop-filter: blur(10px);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 10;
+        }
+
+        #overlay h2 {
+            font-size: 16px;
+            color: white;
+            letter-spacing: 8px;
+            margin-bottom: 25px;
+            text-transform: uppercase;
+        }
+    </style>
+     <!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-HXK18460W4"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-HXK18460W4');
+</script>
+</head>
+<body>
+
+    <div id="game-container">
+        <div class="canvas-wrapper">
+            <canvas id="gameCanvas" width="500" height="600"></canvas>
+            
+            <div id="overlay">
+                <h2 id="overlay-title">Existence Awaits</h2>
+                <button class="btn-primary" id="start-btn" onclick="initGame()">Initialize Existence</button>
+            </div>
+        </div>
+
+        <div class="dashboard">
+            <div class="header">
+                <h1>The Will To Live</h1>
+            </div>
+
+            <div class="score-box">
+                <div class="score-label">Accumulated Burden</div>
+                <div id="score" class="score-value">0000</div>
+            </div>
+
+            <div class="stat-group">
+                <div class="stat-label">
+                    <span>Agency Stability</span>
+                    <span id="sanity-percent">100%</span>
+                </div>
+                <div class="meter-bar">
+                    <div id="sanity-fill"></div>
+                </div>
+            </div>
+
+            <div id="fragment" class="fragment-display">
+                ... awaiting data ...
+            </div>
+
+            <button class="btn-secondary" onclick="resetReality()">Reset Reality</button>
+        </div>
+    </div>
+
+<script>
+    const canvas = document.getElementById("gameCanvas");
+    const ctx = canvas.getContext("2d");
+    const $score = document.getElementById("score");
+    const $fragment = document.getElementById("fragment");
+    const $sanityFill = document.getElementById("sanity-fill");
+    const $sanityPercent = document.getElementById("sanity-percent");
+    const $overlay = document.getElementById("overlay");
+    const $overlayTitle = document.getElementById("overlay-title");
+    const $startBtn = document.getElementById("start-btn");
+
+    // --- GAME STATE ---
+    let paddleWidth = 120;
+    const paddleHeight = 10;
+    let paddleX = (canvas.width - paddleWidth) / 2;
+    
+    let ballRadius = 6;
+    let x, y, dx, dy;
+    let baseSpeed = 2.0; 
+    let currentSpeed = 2.0;
+    let score = 0;
+    let running = false;
+    let bricks = [];
+    const rows = 8;
+    const cols = 7;
+    const bWidth = 58;
+    const bHeight = 12;
+    const bPad = 6;
+    const bOffsetT = 60;
+    const bOffsetL = 30;
+
+    const phrases = [
+        "is this progress?", "the shadow grows longer", "entropy is patient", 
+        "echoes in a hollow room", "we repeat our mistakes", "a fleeting spark",
+        "the architecture of loss", "nothing is permanent", "the weight of silence",
+        "why continue the cycle?", "memories become static", "waiting for the thaw",
+        "gravity always wins", "a ghost in the machine", "time is a circular room",
+        "all dust in the end", "the clock is cold", "silence is the answer"
+    ];
+
+    // --- AUDIO ENGINE ---
+    let audioCtx, osc1, osc2, filter, masterGain;
+
+    function setupAudio() {
+        if (audioCtx) return;
+        audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        osc1 = audioCtx.createOscillator();
+        osc2 = audioCtx.createOscillator();
+        filter = audioCtx.createBiquadFilter();
+        masterGain = audioCtx.createGain();
+
+        osc1.type = 'sawtooth';
+        osc2.type = 'triangle';
+        osc1.frequency.setValueAtTime(55, audioCtx.currentTime); 
+        osc2.frequency.setValueAtTime(82.41, audioCtx.currentTime); 
+
+        filter.type = 'lowpass';
+        filter.frequency.setValueAtTime(400, audioCtx.currentTime);
+        masterGain.gain.setValueAtTime(0.05, audioCtx.currentTime);
+
+        osc1.connect(filter);
+        osc2.connect(filter);
+        filter.connect(masterGain);
+        masterGain.connect(audioCtx.destination);
+
+        osc1.start();
+        osc2.start();
+    }
+
+    function updateExistentialAudio() {
+        if (!audioCtx) return;
+        const lossFactor = (120 - paddleWidth) / 110; 
+        osc1.detune.setTargetAtTime(lossFactor * 800, audioCtx.currentTime, 0.5);
+        osc2.detune.setTargetAtTime(lossFactor * -800, audioCtx.currentTime, 0.5);
+        filter.frequency.setTargetAtTime(400 + (lossFactor * 4000), audioCtx.currentTime, 0.5);
+        
+        const colorVal = 255 - (lossFactor * 255);
+        $sanityFill.style.backgroundColor = `rgb(255, ${colorVal}, ${colorVal})`;
+    }
+
+    function playBlip(freq, type = 'sine') {
+        if (!audioCtx) return;
+        const o = audioCtx.createOscillator();
+        const g = audioCtx.createGain();
+        o.type = type;
+        o.frequency.setValueAtTime(freq, audioCtx.currentTime);
+        o.frequency.exponentialRampToValueAtTime(10, audioCtx.currentTime + 0.1);
+        g.gain.setValueAtTime(0.05, audioCtx.currentTime);
+        g.gain.linearRampToValueAtTime(0, audioCtx.currentTime + 0.1);
+        o.connect(g);
+        g.connect(audioCtx.destination);
+        o.start();
+        o.stop(audioCtx.currentTime + 0.1);
+    }
+
+    // --- CORE LOGIC ---
+    function generateBricks() {
+        bricks = [];
+        for(let c=0; c<cols; c++) {
+            bricks[c] = [];
+            for(let r=0; r<rows; r++) {
+                bricks[c][r] = { x: 0, y: 0, status: 1, text: phrases[Math.floor(Math.random()*phrases.length)] };
+            }
+        }
+    }
+
+    function initGame() {
+        $overlay.style.display = 'none';
+        setupAudio();
+        
+        paddleWidth = 120;
+        score = 0; // Fresh start score
+        currentSpeed = baseSpeed;
+        updateUI();
+        
+        x = canvas.width / 2;
+        y = canvas.height - 150;
+        dx = currentSpeed * (Math.random() > 0.5 ? 1 : -1);
+        dy = -currentSpeed;
+        
+        generateBricks();
+        
+        running = true;
+        draw();
+    }
+
+    function resetReality() {
+        running = false;
+        if (audioCtx) {
+            audioCtx.close();
+            audioCtx = null;
+        }
+        $overlay.style.display = 'flex';
+        $overlayTitle.innerText = "Reality Reset";
+        $startBtn.innerText = "Re-Initialize";
+    }
+
+    function updateUI() {
+        $score.innerText = score.toString().padStart(4, '0');
+        const percent = Math.round((paddleWidth / 120) * 100);
+        $sanityFill.style.width = percent + "%";
+        $sanityPercent.innerText = percent + "%";
+    }
+
+    function checkWin() {
+        let active = 0;
+        for(let c=0; c<cols; c++) {
+            for(let r=0; r<rows; r++) if(bricks[c][r].status === 1) active++;
+        }
+        
+        if(active === 0) {
+            // BOARD CLEARED - REPOPULATE WITHOUT RESETTING SCORE
+            $fragment.innerText = "The cycle repeats...";
+            currentSpeed += 0.5; // Difficulty curve
+            generateBricks();
+            
+            // Reset ball position
+            x = canvas.width / 2;
+            y = canvas.height - 150;
+            dx = currentSpeed * (Math.random() > 0.5 ? 1 : -1);
+            dy = -currentSpeed;
+            
+            playBlip(600, 'sine');
+        }
+    }
+
+    document.addEventListener("mousemove", (e) => {
+        const rect = canvas.getBoundingClientRect();
+        const rootX = e.clientX - rect.left;
+        paddleX = Math.max(0, Math.min(canvas.width - paddleWidth, rootX - paddleWidth / 2));
+    });
+
+    function draw() {
+        if (!running) return;
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+        // Bricks
+        for(let c=0; c<cols; c++) {
+            for(let r=0; r<rows; r++) {
+                let b = bricks[c][r];
+                if(b.status === 1) {
+                    b.x = c * (bWidth + bPad) + bOffsetL;
+                    b.y = r * (bHeight + bPad) + bOffsetT;
+                    ctx.fillStyle = `rgba(76, 175, 80, ${1 - (r * 0.1)})`;
+                    ctx.fillRect(b.x, b.y, bWidth, bHeight);
+                }
+            }
+        }
+
+        // Ball
+        ctx.beginPath();
+        ctx.arc(x, y, ballRadius, 0, Math.PI*2);
+        ctx.fillStyle = "#fff";
+        ctx.fill();
+        ctx.closePath();
+
+        // Paddle
+        ctx.fillStyle = paddleWidth > 40 ? "#fff" : "var(--accent-red)";
+        ctx.fillRect(paddleX, canvas.height - 30, paddleWidth, paddleHeight);
+
+        // Brick Collisions
+        for(let c=0; c<cols; c++) {
+            for(let r=0; r<rows; r++) {
+                let b = bricks[c][r];
+                if(b.status === 1) {
+                    if(x > b.x && x < b.x + bWidth && y > b.y && y < b.y + bHeight) {
+                        dy = -dy;
+                        b.status = 0;
+                        score += 10;
+                        $fragment.innerText = b.text;
+                        updateUI();
+                        playBlip(300 + Math.random() * 200, 'square');
+                        checkWin();
+                    }
+                }
+            }
+        }
+
+        // Wall Collisions
+        if(x + dx > canvas.width - ballRadius || x + dx < ballRadius) dx = -dx;
+        if(y + dy < ballRadius) dy = -dy;
+        else if(y + dy > canvas.height - 30 - ballRadius) {
+            if(x > paddleX && x < paddleX + paddleWidth) {
+                dy = -dy;
+                // Subtle acceleration within the board
+                dx *= 1.005;
+                dy *= 1.005;
+                playBlip(150);
+            } else {
+                paddleWidth = Math.max(10, paddleWidth - 15);
+                updateUI();
+                updateExistentialAudio();
+                playBlip(60, 'sawtooth');
+                
+                // Ball reset
+                x = canvas.width / 2;
+                y = canvas.height / 2;
+                dy = currentSpeed; 
+                dx = currentSpeed * (Math.random() > 0.5 ? 1 : -1);
+            }
+        }
+
+        x += dx;
+        y += dy;
+        requestAnimationFrame(draw);
+    }
+</script>
+</body>
+</html>
