@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <!-- Google Tag Manager -->
     <script>
     (function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
@@ -38,48 +38,74 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            height: 100vh;
+            min-height: 100vh;
+            /* Prevent scrolling on mobile when dragging pieces */
             overflow: hidden;
+            touch-action: none;
         }
 
         #game-container {
             display: flex;
-            gap: 30px;
-            padding: 20px;
+            flex-direction: column; /* Stack vertically on mobile */
+            gap: 15px;
+            padding: 15px;
             background: var(--panel-color);
             border-radius: 12px;
             box-shadow: 0 20px 50px rgba(0,0,0,0.5);
             border: 1px solid #333;
-            max-width: 95vw;
+            width: 95vw;
+            max-width: 900px;
+            box-sizing: border-box;
         }
 
-        /* Chessboard Customization */
+        /* Desktop Layout */
+        @media (min-width: 800px) {
+            #game-container {
+                flex-direction: row;
+                padding: 20px;
+                overflow: visible;
+            }
+            body { overflow: auto; touch-action: auto; }
+        }
+
+        /* Chessboard Sizing */
         #myBoard {
-            width: 500px;
+            width: 100%;
+            max-width: 500px;
+            margin: 0 auto;
             border: 5px solid #111;
             border-radius: 4px;
+            touch-action: none; /* Crucial for mobile dragging */
         }
-        /* Override chessboard.js default colors */
+
         .black-3c85d { background-color: var(--board-dark) !important; }
         .white-1e1d7 { background-color: var(--board-light) !important; }
 
         .info-panel {
-            width: 300px;
+            flex: 1;
             display: flex;
             flex-direction: column;
+            min-width: 0;
         }
 
-        h1 { margin: 0 0 10px 0; font-size: 1.5rem; color: var(--accent-green); text-transform: uppercase; letter-spacing: 2px; }
+        h1 { 
+            margin: 0 0 10px 0; 
+            font-size: 1.2rem; 
+            color: var(--accent-green); 
+            text-transform: uppercase; 
+            letter-spacing: 2px;
+            text-align: center;
+        }
 
         .status-box {
             background: #111;
-            padding: 15px;
+            padding: 10px;
             border-radius: 6px;
             border-left: 4px solid var(--accent-green);
-            margin-bottom: 20px;
+            margin-bottom: 10px;
         }
 
-        #status { font-weight: bold; font-size: 1.1rem; }
+        #status { font-weight: bold; font-size: 0.9rem; }
 
         .move-history {
             flex-grow: 1;
@@ -87,14 +113,20 @@
             padding: 10px;
             border-radius: 6px;
             font-family: 'Courier New', Courier, monospace;
-            font-size: 0.85rem;
+            font-size: 0.8rem;
             color: #aaa;
             overflow-y: auto;
-            max-height: 250px;
+            height: 100px; /* Short height for mobile */
             border: 1px solid #333;
         }
 
-        .controls { margin-top: 20px; display: flex; gap: 10px; }
+        @media (min-width: 800px) {
+            .move-history { height: 250px; }
+            h1 { text-align: left; font-size: 1.5rem; }
+            #status { font-size: 1.1rem; }
+        }
+
+        .controls { margin-top: 15px; display: flex; gap: 10px; }
 
         button {
             flex: 1;
@@ -105,25 +137,24 @@
             border-radius: 4px;
             font-weight: bold;
             cursor: pointer;
-            transition: transform 0.1s, background 0.2s;
+            font-size: 0.9rem;
+            touch-action: manipulation;
         }
-        button:hover { background: #3d8b40; }
-        button:active { transform: scale(0.95); }
+        button:active { transform: scale(0.95); opacity: 0.8; }
         button.secondary { background: #444; }
 
-        /* Game Over Overlay */
         #overlay {
             position: absolute;
             inset: 0;
             background: rgba(0,0,0,0.85);
-            display: none; /* Controlled by JS */
+            display: none;
             flex-direction: column;
             justify-content: center;
             align-items: center;
             z-index: 100;
-            border-radius: 12px;
+            border-radius: 4px;
         }
-        #overlay h2 { font-size: 3rem; color: var(--accent-red); margin-bottom: 10px; }
+        #overlay h2 { font-size: 2rem; color: var(--accent-red); margin-bottom: 20px; }
     </style>
      <!-- Google tag (gtag.js) -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-HXK18460W4"></script>
@@ -131,7 +162,6 @@
   window.dataLayer = window.dataLayer || [];
   function gtag(){dataLayer.push(arguments);}
   gtag('js', new Date());
-
   gtag('config', 'G-HXK18460W4');
 </script>
 </head>
@@ -139,11 +169,11 @@
 
     <div id="game-container">
         <!-- The Board -->
-        <div style="position: relative;">
+        <div style="position: relative; width: 100%; max-width: 500px; margin: 0 auto;">
             <div id="myBoard"></div>
             <div id="overlay">
                 <h2 id="overlay-msg">CHECKMATE</h2>
-                <button onclick="resetGame()" style="width: 200px;">PLAY AGAIN</button>
+                <button onclick="resetGame()" style="width: 150px;">PLAY AGAIN</button>
             </div>
         </div>
 
@@ -155,7 +185,6 @@
                 <div id="status">White to move</div>
             </div>
 
-            <div style="margin-bottom: 5px; font-size: 0.8rem; color: #666;">LOGS:</div>
             <div id="pgn" class="move-history"></div>
 
             <div class="controls">
@@ -167,9 +196,21 @@
 
     <script>
         // --- AUDIO ENGINE ---
-        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        let audioCtx = null;
         
+        function initAudio() {
+            if (!audioCtx) {
+                audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            }
+            if (audioCtx.state === 'suspended') {
+                audioCtx.resume();
+            }
+        }
+
         function playSfx(type) {
+            if (!audioCtx) return;
+            initAudio(); // Ensure context is active
+
             const osc = audioCtx.createOscillator();
             const gain = audioCtx.createGain();
             osc.connect(gain);
@@ -215,6 +256,7 @@
         var $overlay = $('#overlay');
 
         function onDragStart (source, piece, position, orientation) {
+            initAudio(); // Initialize audio on first interaction
             if (game.game_over()) return false;
             if ((game.turn() === 'w' && piece.search(/^b/) !== -1) ||
                 (game.turn() === 'b' && piece.search(/^w/) !== -1)) {
@@ -231,7 +273,6 @@
 
             if (move === null) return 'snapback';
 
-            // Play Sounds based on move result
             if (move.captured) {
                 playSfx('capture');
             } else {
@@ -296,7 +337,13 @@
         updateStatus();
 
         // Responsive handling
-        $(window).resize(board.resize);
+        $(window).resize(function() {
+            board.resize();
+        });
+
+        // Initialize audio on first click/touch of the document
+        document.addEventListener('touchstart', initAudio, {once: true});
+        document.addEventListener('mousedown', initAudio, {once: true});
 
     </script>
 </body>

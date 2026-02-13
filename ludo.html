@@ -2,16 +2,15 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-     <!-- Google tag (gtag.js) -->
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-HXK18460W4"></script>
-<script>
-  window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
-  gtag('js', new Date());
-
-  gtag('config', 'G-HXK18460W4');
-</script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <!-- Google Tag Manager -->
+    <script>
+    (function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+    new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+    j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+    'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+    })(window,document,'script','dataLayer','GTM-K2MKRGPZ');
+    </script>
     <title>Ludo Pro | Elite Edition</title>
     
     <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
@@ -27,6 +26,10 @@
             --p4-blue: #3498db;
             --neutral-path: #2c3e50;
             --border-color: #000;
+            
+            /* Dynamic sizing: 42px on desktop, scales down on mobile */
+            --cell-size: min(6.4vmin, 42px);
+            --board-size: calc(var(--cell-size) * 15);
         }
 
         body {
@@ -37,26 +40,42 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            height: 100vh;
-            overflow: hidden;
+            min-height: 100vh;
+            overflow-x: hidden;
+            touch-action: manipulation;
         }
 
         #game-container {
             display: flex;
-            gap: 40px;
-            padding: 25px;
+            flex-direction: row;
+            gap: 20px;
+            padding: 20px;
             background: var(--panel-color);
             border-radius: 16px;
             box-shadow: 0 25px 50px rgba(0,0,0,0.6);
             border: 1px solid #333;
+            max-width: 98vw;
+        }
+
+        /* Mobile layout: Panel moves to bottom */
+        @media (max-width: 850px) {
+            #game-container {
+                flex-direction: column;
+                align-items: center;
+                padding: 10px;
+                gap: 15px;
+            }
+            .info-panel { width: 100% !important; max-width: var(--board-size); }
+            h1 { font-size: 1.4rem !important; margin-bottom: 5px !important; }
         }
 
         #ludo-board {
             display: grid;
-            grid-template-columns: repeat(15, 42px);
-            grid-template-rows: repeat(15, 42px);
+            grid-template-columns: repeat(15, var(--cell-size));
+            grid-template-rows: repeat(15, var(--cell-size));
             background-color: var(--border-color);
-            border: 8px solid #111;
+            border: 4px solid #111;
+            user-select: none;
         }
 
         .cell {
@@ -80,22 +99,20 @@
         .path-yellow { background-color: #7a630a !important; }
         .path-blue { background-color: #164363 !important; }
 
-        /* Safe Spots */
         .safe::after {
             content: '★';
             color: rgba(255,255,255,0.3);
-            font-size: 24px;
+            font-size: calc(var(--cell-size) * 0.6);
         }
 
-        /* Center */
         .center-finish {
             background: radial-gradient(circle, #fff 10%, #333 90%);
         }
 
         /* Tokens */
         .token {
-            width: 30px;
-            height: 30px;
+            width: calc(var(--cell-size) * 0.75);
+            height: calc(var(--cell-size) * 0.75);
             border-radius: 50%;
             border: 2px solid #fff;
             cursor: pointer;
@@ -103,6 +120,7 @@
             transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
             box-shadow: 0 4px 8px rgba(0,0,0,0.5);
             position: absolute;
+            pointer-events: auto;
         }
         .token.red { background: var(--p1-red); }
         .token.green { background: var(--p2-green); }
@@ -112,47 +130,47 @@
         .token.active-move {
             animation: pulse 0.6s infinite alternate;
             box-shadow: 0 0 15px #fff;
-            z-index: 20;
+            z-index: 100 !important; /* Forces active token on top of stack */
+            border: 3px solid #fff;
         }
 
-        @keyframes pulse { from { transform: scale(1); } to { transform: scale(1.2); } }
+        @keyframes pulse { from { transform: scale(1) translateY(0); } to { transform: scale(1.15) translateY(-5px); } }
 
         /* UI Panel */
-        .info-panel { width: 320px; display: flex; flex-direction: column; }
+        .info-panel { width: 300px; display: flex; flex-direction: column; }
         h1 { margin: 0 0 10px 0; font-size: 1.8rem; color: #fff; letter-spacing: 2px; text-transform: uppercase; }
         
         .status-box {
             background: #111;
-            padding: 20px;
+            padding: 15px;
             border-radius: 8px;
             border-left: 5px solid var(--p1-red);
-            margin-bottom: 20px;
-            transition: border-color 0.3s;
+            margin-bottom: 15px;
         }
 
         .dice-area {
             display: flex;
             align-items: center;
-            gap: 20px;
+            gap: 15px;
             background: #111;
-            padding: 20px;
+            padding: 15px;
             border-radius: 8px;
-            margin-bottom: 20px;
+            margin-bottom: 15px;
         }
 
         #dice {
-            width: 64px;
-            height: 64px;
+            width: 55px;
+            height: 55px;
             background: #fdfdfd;
             color: #111;
             display: flex;
             justify-content: center;
             align-items: center;
-            font-size: 32px;
+            font-size: 28px;
             font-weight: 900;
-            border-radius: 12px;
+            border-radius: 10px;
             cursor: pointer;
-            box-shadow: 0 5px 0 #bbb;
+            box-shadow: 0 4px 0 #bbb;
             user-select: none;
         }
         #dice.rolling { animation: shake 0.1s infinite; }
@@ -161,33 +179,31 @@
         .log-container {
             flex-grow: 1;
             background: #0a0a0a;
-            padding: 15px;
+            padding: 12px;
             border-radius: 8px;
-            font-family: 'Courier New', Courier, monospace;
-            font-size: 0.85rem;
+            font-family: 'Courier New', monospace;
+            font-size: 0.8rem;
             color: #777;
             overflow-y: auto;
-            max-height: 220px;
+            max-height: 150px;
             border: 1px solid #333;
         }
 
         button {
-            margin-top: 15px;
+            margin-top: 10px;
             background: #444;
             color: #fff;
             border: none;
-            padding: 12px;
+            padding: 10px;
             border-radius: 4px;
             cursor: pointer;
             font-weight: bold;
-            transition: background 0.2s;
         }
-        button:hover { background: #555; }
 
         #overlay {
             position: absolute; inset: 0; background: rgba(0,0,0,0.95);
             display: none; flex-direction: column; justify-content: center;
-            align-items: center; z-index: 100; border-radius: 16px;
+            align-items: center; z-index: 1000; border-radius: 16px;
         }
     </style>
      <!-- Google tag (gtag.js) -->
@@ -196,7 +212,6 @@
   window.dataLayer = window.dataLayer || [];
   function gtag(){dataLayer.push(arguments);}
   gtag('js', new Date());
-
   gtag('config', 'G-HXK18460W4');
 </script>
 </head>
@@ -206,7 +221,7 @@
         <div style="position: relative;">
             <div id="ludo-board"></div>
             <div id="overlay">
-                <h2 id="win-msg" style="color: var(--p1-red); font-size: 3rem;">RED WINS!</h2>
+                <h2 id="win-msg" style="color: var(--p1-red); font-size: 2.5rem;">RED WINS!</h2>
                 <button onclick="location.reload()" style="padding: 15px 40px; font-size: 1.2rem;">PLAY AGAIN</button>
             </div>
         </div>
@@ -215,15 +230,15 @@
             <h1>LUDO PRO</h1>
             
             <div class="status-box" id="status-card">
-                <div style="font-size: 0.7rem; opacity: 0.5; text-transform: uppercase;">Next Action</div>
-                <div id="status-text" style="font-size: 1.3rem; font-weight: bold; color: var(--p1-red);">RED TO ROLL</div>
+                <div style="font-size: 0.7rem; opacity: 0.5; text-transform: uppercase;">Current Turn</div>
+                <div id="status-text" style="font-size: 1.2rem; font-weight: bold; color: var(--p1-red);">RED TO ROLL</div>
             </div>
 
             <div class="dice-area">
                 <div id="dice" onclick="rollDice()">?</div>
                 <div>
                     <div id="dice-status" style="font-weight: bold; color: #fff;">ROLL DICE</div>
-                    <div style="font-size: 0.8rem; opacity: 0.6;">Click to shake</div>
+                    <div style="font-size: 0.75rem; opacity: 0.6;">Tap the cube</div>
                 </div>
             </div>
 
@@ -233,7 +248,7 @@
     </div>
 
     <script>
-        // --- SOUNDS ---
+        // --- SOUNDS (preserved) ---
         const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
         function playSfx(freq, duration, type='sine') {
             const osc = audioCtx.createOscillator();
@@ -246,7 +261,7 @@
             osc.start(); osc.stop(audioCtx.currentTime + duration);
         }
 
-        // --- GAME DATA ---
+        // --- GAME DATA (preserved) ---
         const MASTER_PATH = [
             [6,0],[6,1],[6,2],[6,3],[6,4],[6,5],[5,6],[4,6],[3,6],[2,6],[1,6],[0,6],[0,7],
             [0,8],[1,8],[2,8],[3,8],[4,8],[5,8],[6,9],[6,10],[6,11],[6,12],[6,13],[6,14],[7,14],
@@ -270,31 +285,21 @@
         let isRolling = false;
         let gameState = { red: [-1,-1,-1,-1], green: [-1,-1,-1,-1], yellow: [-1,-1,-1,-1], blue: [-1,-1,-1,-1] };
 
-        // --- INIT ---
         function createBoard() {
             const board = $('#ludo-board');
             for(let r=0; r<15; r++) {
                 for(let c=0; c<15; c++) {
                     let cell = $(`<div class="cell" id="cell-${r}-${c}"></div>`);
-                    
                     if(r<6 && c<6) cell.addClass('base-red');
                     else if(r<6 && c>8) cell.addClass('base-green');
                     else if(r>8 && c>8) cell.addClass('base-yellow');
                     else if(r>8 && c<6) cell.addClass('base-blue');
-                    
                     if(r==7 && c>0 && c<7) cell.addClass('path-red');
                     if(c==7 && r>0 && r<7) cell.addClass('path-green');
                     if(r==7 && c>7 && c<14) cell.addClass('path-yellow');
                     if(c==7 && r>7 && r<14) cell.addClass('path-blue');
-
-                    if(r==6 && c==1) cell.addClass('path-red safe');
-                    if(r==1 && c==8) cell.addClass('path-green safe');
-                    if(r==8 && c==13) cell.addClass('path-yellow safe');
-                    if(r==13 && c==6) cell.addClass('path-blue safe');
-
                     if(SAFE_SPOTS.includes(`${r},${c}`)) cell.addClass('safe');
                     if(r>=6 && r<=8 && c>=6 && c<=8) cell.addClass('center-finish');
-
                     board.append(cell);
                 }
             }
@@ -312,20 +317,44 @@
 
         function updateTokens() {
             $('.token').remove();
+            
+            // Map to track multiple tokens on one cell
+            const cellOccupancy = {};
+
             players.forEach(p => {
                 gameState[p].forEach((pos, idx) => {
                     if(pos === 100) return;
                     let [r, c] = getCoords(p, idx);
+                    let cellId = `cell-${r}-${c}`;
+                    
+                    // Logic for stacking and Z-indexing
+                    cellOccupancy[cellId] = (cellOccupancy[cellId] || 0) + 1;
+                    let stackCount = cellOccupancy[cellId];
+                    
                     let token = $(`<div class="token ${p}"></div>`).attr('data-player', p).attr('data-idx', idx);
+                    
+                    // Apply visual offset for stacks
+                    let offset = (stackCount - 1) * 3;
+                    token.css({
+                        'transform': `translate(${offset}px, ${offset}px)`,
+                        'z-index': 10 + stackCount
+                    });
+
+                    // Logic: If it is this player's turn and token can move, put it on top
                     if(canMove && p === players[turn] && isValidMove(p, idx)) {
-                        token.addClass('active-move').click(() => moveToken(p, idx));
+                        token.addClass('active-move');
+                        // Mobile support: touchstart/touchend logic often better but click works well on most mobile browsers now
+                        token.on('click touchend', function(e) {
+                            e.preventDefault();
+                            moveToken(p, idx);
+                        });
                     }
-                    $(`#cell-${r}-${c}`).append(token);
+                    
+                    $(`#${cellId}`).append(token);
                 });
             });
         }
 
-        // --- CORE LOGIC ---
         function rollDice() {
             if(isRolling || canMove) return;
             isRolling = true;
@@ -339,11 +368,11 @@
                 
                 let p = players[turn];
                 if(!gameState[p].some((_, i) => isValidMove(p, i))) {
-                    log(`${p} rolled ${diceVal}. No valid moves.`);
+                    log(`${p} rolled ${diceVal}. No moves.`);
                     setTimeout(nextTurn, 1000);
                 } else {
                     canMove = true;
-                    $('#dice-status').text("SELECT TOKEN");
+                    $('#dice-status').text("TAP TOKEN");
                     updateTokens();
                 }
             }, 600);
@@ -362,64 +391,44 @@
             let pos = gameState[player][idx];
             let bonusTurn = false;
             
-            if(pos === -1) {
-                gameState[player][idx] = 0;
-            } else {
-                gameState[player][idx] += diceVal;
-            }
+            if(pos === -1) gameState[player][idx] = 0;
+            else gameState[player][idx] += diceVal;
 
-            // Check if reached home center
             if(gameState[player][idx] === 56) {
                 gameState[player][idx] = 100;
-                log(`${player} reached home center! BONUS TURN.`);
+                log(`${player} finished! Bonus.`);
                 bonusTurn = true;
                 playSfx(800, 0.3);
             }
 
             playSfx(400, 0.1);
-            
-            // Check for captures
-            let captured = checkCapture(player, idx);
-            if(captured) {
-                bonusTurn = true;
-                log(`CAPTURED! ${player} gets a BONUS TURN.`);
-            }
-
-            // Check for rolling a 6
-            if(diceVal === 6) {
-                bonusTurn = true;
-                log(`${player} rolled 6. BONUS TURN.`);
-            }
+            if(checkCapture(player, idx)) { bonusTurn = true; log(`CAPTURE! ${player} bonus turn.`); }
+            if(diceVal === 6) { bonusTurn = true; log(`${player} rolled 6. Bonus.`); }
 
             checkWin(player);
-            
-            if(bonusTurn) {
-                resetDice();
-            } else {
-                nextTurn();
-            }
+            if(bonusTurn) resetDice();
+            else nextTurn();
         }
 
         function checkCapture(player, idx) {
             let pos = gameState[player][idx];
-            if(pos === -1 || pos > 50) return false; // Can't capture in base or home stretch
-
+            if(pos === -1 || pos > 50) return false;
             let [r, c] = getCoords(player, idx);
-            if(SAFE_SPOTS.includes(`${r},${c}`)) return false; // Safe square
+            if(SAFE_SPOTS.includes(`${r},${c}`)) return false;
 
-            let captureHappened = false;
+            let captured = false;
             players.forEach(opp => {
                 if(opp === player) return;
                 gameState[opp].forEach((oppPos, oppIdx) => {
                     let [or, oc] = getCoords(opp, oppIdx);
                     if(r === or && c === oc && oppPos !== -1) {
                         gameState[opp][oppIdx] = -1;
-                        captureHappened = true;
+                        captured = true;
                         playSfx(100, 0.5, 'sawtooth');
                     }
                 });
             });
-            return captureHappened;
+            return captured;
         }
 
         function nextTurn() {
@@ -450,8 +459,14 @@
             $logs.prepend(`<div>> ${msg}</div>`);
         }
 
+        // Fix for AudioContext on mobile (requires interaction)
+        $(document).on('click touchend', function() {
+            if (audioCtx.state === 'suspended') {
+                audioCtx.resume();
+            }
+        });
+
         createBoard();
-        log("Match Started. Red to roll.");
     </script>
 </body>
 </html>

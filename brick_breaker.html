@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <!-- Google Tag Manager -->
     <script>
     (function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
@@ -33,17 +33,21 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            height: 100vh;
+            min-height: 100vh;
             overflow: hidden;
+            /* Prevent pull-to-refresh on mobile */
+            overscroll-behavior-y: contain;
         }
 
         #game-container {
             display: flex;
+            flex-direction: row;
             gap: 2px;
             background: var(--border);
             padding: 2px;
             border-radius: 8px;
             box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.7);
+            max-width: 95vw;
         }
 
         .canvas-wrapper {
@@ -58,27 +62,53 @@
 
         canvas {
             background: radial-gradient(circle, #111 0%, #000 100%);
-            cursor: none;
+            display: block;
+            max-width: 100%;
+            height: auto;
+            touch-action: none; /* Prevents scrolling while playing */
         }
 
         .dashboard {
-            width: 320px;
+            width: 300px;
             background: var(--panel-bg);
             display: flex;
             flex-direction: column;
-            padding: 24px;
+            padding: 20px;
             border-radius: 0 6px 6px 0;
+        }
+
+        /* RESPONSIVE LAYOUT */
+        @media (max-width: 850px) {
+            body {
+                overflow-y: auto;
+                align-items: flex-start;
+                padding: 10px;
+            }
+            #game-container {
+                flex-direction: column;
+                width: 100%;
+            }
+            .canvas-wrapper {
+                border-radius: 6px 6px 0 0;
+            }
+            .dashboard {
+                width: auto;
+                border-radius: 0 0 6px 6px;
+            }
+            .fragment-display {
+                min-height: 80px;
+            }
         }
 
         .header {
             border-bottom: 1px solid var(--border);
-            padding-bottom: 15px;
-            margin-bottom: 20px;
+            padding-bottom: 10px;
+            margin-bottom: 15px;
         }
 
         .header h1 {
             margin: 0;
-            font-size: 14px;
+            font-size: 12px;
             text-transform: uppercase;
             letter-spacing: 3px;
             color: var(--accent-green);
@@ -86,15 +116,15 @@
 
         .score-box {
             background: #111;
-            padding: 20px;
+            padding: 15px;
             border-radius: 4px;
             border: 1px solid var(--border);
             text-align: center;
-            margin-bottom: 20px;
+            margin-bottom: 15px;
         }
 
         .score-label {
-            font-size: 10px;
+            font-size: 9px;
             color: var(--text-dim);
             text-transform: uppercase;
             letter-spacing: 2px;
@@ -103,9 +133,8 @@
 
         .score-value {
             font-family: 'JetBrains Mono', monospace;
-            font-size: 32px;
+            font-size: 28px;
             color: var(--accent-green);
-            text-shadow: 0 0 10px rgba(76, 175, 80, 0.3);
         }
 
         .fragment-display {
@@ -121,25 +150,13 @@
             font-style: italic;
             font-family: 'Georgia', serif;
             color: #aaa;
-            font-size: 18px;
+            font-size: 16px;
             line-height: 1.4;
-            margin-bottom: 20px;
+            margin-bottom: 15px;
             position: relative;
-            overflow: hidden;
         }
 
-        .fragment-display::before {
-            content: "MESSAGE_FRAGMENT";
-            position: absolute;
-            top: 5px;
-            left: 5px;
-            font-family: monospace;
-            font-size: 8px;
-            color: #333;
-            font-style: normal;
-        }
-
-        .stat-group { margin-bottom: 20px; }
+        .stat-group { margin-bottom: 15px; }
 
         .stat-label {
             font-size: 10px;
@@ -162,23 +179,21 @@
             height: 100%;
             width: 100%;
             background: var(--accent-green);
-            transition: width 0.4s ease, background-color 1s ease;
+            transition: width 0.4s ease;
         }
 
         .btn-primary {
             background: transparent;
             border: 1px solid var(--accent-green);
             color: var(--accent-green);
-            padding: 12px;
-            font-size: 11px;
+            padding: 16px 32px;
+            font-size: 14px;
             font-weight: bold;
             text-transform: uppercase;
             letter-spacing: 2px;
             cursor: pointer;
-            transition: all 0.2s;
+            z-index: 11;
         }
-
-        .btn-primary:hover { background: var(--accent-green); color: black; }
 
         .btn-secondary {
             background: transparent;
@@ -188,27 +203,20 @@
             font-size: 10px;
             text-transform: uppercase;
             cursor: pointer;
-            width: 100%;
         }
 
         #overlay {
             position: absolute;
             inset: 0;
-            background: rgba(0,0,0,0.85);
+            background: rgba(0,0,0,0.9);
             backdrop-filter: blur(10px);
             display: flex;
             flex-direction: column;
             justify-content: center;
             align-items: center;
             z-index: 10;
-        }
-
-        #overlay h2 {
-            font-size: 16px;
-            color: white;
-            letter-spacing: 8px;
-            margin-bottom: 25px;
-            text-transform: uppercase;
+            padding: 20px;
+            text-align: center;
         }
     </style>
      <!-- Google tag (gtag.js) -->
@@ -217,7 +225,6 @@
   window.dataLayer = window.dataLayer || [];
   function gtag(){dataLayer.push(arguments);}
   gtag('js', new Date());
-
   gtag('config', 'G-HXK18460W4');
 </script>
 </head>
@@ -225,11 +232,12 @@
 
     <div id="game-container">
         <div class="canvas-wrapper">
+            <!-- Using fixed internal resolution, scaled via CSS -->
             <canvas id="gameCanvas" width="500" height="600"></canvas>
             
             <div id="overlay">
                 <h2 id="overlay-title">Existence Awaits</h2>
-                <button class="btn-primary" id="start-btn" onclick="initGame()">Initialize Existence</button>
+                <button class="btn-primary" id="start-btn" onclick="initGame()">Initialize</button>
             </div>
         </div>
 
@@ -254,7 +262,7 @@
             </div>
 
             <div id="fragment" class="fragment-display">
-                ... awaiting data ...
+                ... touch to begin ...
             </div>
 
             <button class="btn-secondary" onclick="resetReality()">Reset Reality</button>
@@ -277,17 +285,17 @@
     const paddleHeight = 10;
     let paddleX = (canvas.width - paddleWidth) / 2;
     
-    let ballRadius = 6;
+    let ballRadius = 8; // Slightly larger for mobile visibility
     let x, y, dx, dy;
-    let baseSpeed = 2.0; 
-    let currentSpeed = 2.0;
+    let baseSpeed = 3.0; 
+    let currentSpeed = 3.0;
     let score = 0;
     let running = false;
     let bricks = [];
     const rows = 8;
     const cols = 7;
     const bWidth = 58;
-    const bHeight = 12;
+    const bHeight = 14;
     const bPad = 6;
     const bOffsetT = 60;
     const bOffsetL = 30;
@@ -296,9 +304,8 @@
         "is this progress?", "the shadow grows longer", "entropy is patient", 
         "echoes in a hollow room", "we repeat our mistakes", "a fleeting spark",
         "the architecture of loss", "nothing is permanent", "the weight of silence",
-        "why continue the cycle?", "memories become static", "waiting for the thaw",
-        "gravity always wins", "a ghost in the machine", "time is a circular room",
-        "all dust in the end", "the clock is cold", "silence is the answer"
+        "why continue?", "memories become static", "waiting for the thaw",
+        "gravity always wins", "a ghost in the machine", "all dust in the end"
     ];
 
     // --- AUDIO ENGINE ---
@@ -306,7 +313,8 @@
 
     function setupAudio() {
         if (audioCtx) return;
-        audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        const AudioContext = window.AudioContext || window.webkitAudioContext;
+        audioCtx = new AudioContext();
         osc1 = audioCtx.createOscillator();
         osc2 = audioCtx.createOscillator();
         filter = audioCtx.createBiquadFilter();
@@ -342,7 +350,7 @@
     }
 
     function playBlip(freq, type = 'sine') {
-        if (!audioCtx) return;
+        if (!audioCtx || audioCtx.state !== 'running') return;
         const o = audioCtx.createOscillator();
         const g = audioCtx.createGain();
         o.type = type;
@@ -355,6 +363,29 @@
         o.start();
         o.stop(audioCtx.currentTime + 0.1);
     }
+
+    // --- MOVEMENT UNIFICATION ---
+    function handleMove(clientX) {
+        const rect = canvas.getBoundingClientRect();
+        // Calculate scale in case canvas is CSS-resized
+        const scaleX = canvas.width / rect.width;
+        const rootX = (clientX - rect.left) * scaleX;
+        paddleX = Math.max(0, Math.min(canvas.width - paddleWidth, rootX - paddleWidth / 2));
+    }
+
+    // Mouse Listeners
+    document.addEventListener("mousemove", (e) => handleMove(e.clientX));
+
+    // Touch Listeners
+    canvas.addEventListener("touchstart", (e) => {
+        if(running) e.preventDefault();
+        handleMove(e.touches[0].clientX);
+    }, { passive: false });
+
+    canvas.addEventListener("touchmove", (e) => {
+        if(running) e.preventDefault();
+        handleMove(e.touches[0].clientX);
+    }, { passive: false });
 
     // --- CORE LOGIC ---
     function generateBricks() {
@@ -370,9 +401,10 @@
     function initGame() {
         $overlay.style.display = 'none';
         setupAudio();
+        if (audioCtx.state === 'suspended') audioCtx.resume();
         
         paddleWidth = 120;
-        score = 0; // Fresh start score
+        score = 0;
         currentSpeed = baseSpeed;
         updateUI();
         
@@ -412,26 +444,16 @@
         }
         
         if(active === 0) {
-            // BOARD CLEARED - REPOPULATE WITHOUT RESETTING SCORE
             $fragment.innerText = "The cycle repeats...";
-            currentSpeed += 0.5; // Difficulty curve
+            currentSpeed += 0.5;
             generateBricks();
-            
-            // Reset ball position
             x = canvas.width / 2;
             y = canvas.height - 150;
             dx = currentSpeed * (Math.random() > 0.5 ? 1 : -1);
             dy = -currentSpeed;
-            
             playBlip(600, 'sine');
         }
     }
-
-    document.addEventListener("mousemove", (e) => {
-        const rect = canvas.getBoundingClientRect();
-        const rootX = e.clientX - rect.left;
-        paddleX = Math.max(0, Math.min(canvas.width - paddleWidth, rootX - paddleWidth / 2));
-    });
 
     function draw() {
         if (!running) return;
@@ -485,7 +507,7 @@
         else if(y + dy > canvas.height - 30 - ballRadius) {
             if(x > paddleX && x < paddleX + paddleWidth) {
                 dy = -dy;
-                // Subtle acceleration within the board
+                // Subtle acceleration
                 dx *= 1.005;
                 dy *= 1.005;
                 playBlip(150);
@@ -495,7 +517,6 @@
                 updateExistentialAudio();
                 playBlip(60, 'sawtooth');
                 
-                // Ball reset
                 x = canvas.width / 2;
                 y = canvas.height / 2;
                 dy = currentSpeed; 
